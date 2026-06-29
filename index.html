@@ -477,8 +477,8 @@ const COURSE = [
           <ul>
             <li><strong>Excel</strong> — the universal starting point. Fast for cleaning, calculating, and exploring small-to-medium data. Almost every analytics job expects it.</li>
             <li><strong>Power BI</strong> (or Tableau) — turns data into interactive dashboards stakeholders can click through. The "visual storytelling" layer.</li>
-            <li><strong>SQL</strong> — the language for pulling data <em>out of databases</em>. Non-negotiable once data is too big for a spreadsheet. <em>(Coming next in DATA LAB.)</em></li>
-            <li><strong>Python</strong> — for automation, bigger datasets, and statistics/forecasting. <em>(Coming after SQL.)</em></li>
+            <li><strong>SQL</strong> — the language for pulling data <em>out of databases</em>. Non-negotiable once data is too big for a spreadsheet. <em>(Module 04 in DATA LAB.)</em></li>
+            <li><strong>Python</strong> — for automation, bigger datasets, and statistics/forecasting. <em>(Module 05 in DATA LAB.)</em></li>
             <li><strong>Statistics</strong> — the reasoning that keeps your conclusions honest (averages, distributions, correlation vs causation).</li>
           </ul>
           <h3>The order that works</h3>
@@ -817,16 +817,345 @@ const COURSE = [
     ]
   },
   {
-    id:"m3", num:"04", title:"SQL", soon:true,
-    blurb:"Pull data straight from databases — joins, filtering, and aggregation.",
-    note:"Pull data straight from databases — SELECT, joins, filtering, and aggregation. Arriving after you've mastered Excel and Power BI.",
-    lessons:[]
+    id:"m3", num:"04", title:"SQL", soon:false,
+    blurb:"Pull data straight from databases — the language every analyst is expected to know.",
+    lessons:[
+      {
+        id:"l3-1", title:"Databases & your first SELECT", dur:"13 min read · full course",
+        sub:"Why SQL exists, how databases are structured, and your first query.",
+        video:{id:"HXV3zeQKqGY", title:"SQL Tutorial — Full Database Course for Beginners", channel:"freeCodeCamp"},
+        body:`
+          <p>Once data outgrows a spreadsheet, it lives in a <strong>database</strong>. <strong>SQL</strong> (Structured Query Language) is how you ask that database questions. It's the most universal analyst skill after Excel — almost every data job listing names it.</p>
+          <h3>How a relational database is organised</h3>
+          <ul>
+            <li><strong>Tables</strong> hold one kind of thing — a <code>customers</code> table, an <code>orders</code> table.</li>
+            <li><strong>Rows</strong> are individual records (one customer, one order).</li>
+            <li><strong>Columns</strong> are the fields (name, country, amount), each with a fixed data type.</li>
+            <li><strong>Keys</strong> connect tables — an <code>order</code> stores a <code>customer_id</code> that points back to a row in <code>customers</code>.</li>
+          </ul>
+          <p>If that sounds like a set of linked Excel sheets, that's exactly the right mental picture — just bigger, faster, and shared by many people at once.</p>
+          <h3>The shape of every query</h3>
+          <p>Almost everything starts with <code>SELECT</code> (which columns) and <code>FROM</code> (which table):</p>
+          <p><code>SELECT name, country FROM customers;</code></p>
+          <p>Use <code>SELECT *</code> to grab every column, and <code>LIMIT</code> to peek at just a few rows while you explore:</p>
+          <p><code>SELECT * FROM orders LIMIT 10;</code></p>
+          <div class="callout"><div><b>Read it like English:</b> "select these columns, from this table, where this is true, ordered by that." SQL clauses always run in that order, so writing them in that order keeps you out of trouble.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>A database is linked tables of rows and columns — like connected spreadsheets.</li>
+            <li>Every query is built from <code>SELECT</code> + <code>FROM</code>, then optional clauses.</li>
+            <li><code>SELECT * ... LIMIT 10</code> is your "let me look at this data" reflex.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l3-2", title:"Filtering & sorting: WHERE and ORDER BY", dur:"12 min read",
+        sub:"Narrow millions of rows down to the ones that answer your question.",
+        video:null,
+        body:`
+          <p>Raw tables are huge. The skill is asking for exactly the slice you need. That's what <code>WHERE</code> does.</p>
+          <h3>WHERE — keep only matching rows</h3>
+          <ul>
+            <li><strong>Compare:</strong> <code>WHERE country = 'France'</code>, <code>WHERE amount &gt; 100</code>.</li>
+            <li><strong>Combine</strong> with <code>AND</code> / <code>OR</code>: <code>WHERE country = 'France' AND amount &gt; 100</code>.</li>
+            <li><strong>List of options:</strong> <code>WHERE country IN ('France','Spain','Italy')</code>.</li>
+            <li><strong>Ranges:</strong> <code>WHERE amount BETWEEN 50 AND 200</code>.</li>
+            <li><strong>Pattern match:</strong> <code>WHERE name LIKE 'A%'</code> (starts with A). The <code>%</code> means "any characters".</li>
+            <li><strong>Missing values:</strong> <code>WHERE region IS NULL</code> (never use <code>= NULL</code> — it won't work).</li>
+          </ul>
+          <h3>ORDER BY — sort the result</h3>
+          <p><code>ORDER BY amount DESC</code> sorts biggest first; <code>ASC</code> (the default) is smallest first. You can sort by several columns: <code>ORDER BY country ASC, amount DESC</code>.</p>
+          <h3>DISTINCT — remove duplicates</h3>
+          <p><code>SELECT DISTINCT country FROM customers;</code> returns each country once — handy for "what values actually appear in this column?".</p>
+          <div class="callout"><div><b>Watch your quotes:</b> text values go in single quotes (<code>'France'</code>); numbers don't (<code>100</code>). A surprising amount of beginner pain is just a missing or wrong quote.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li><code>WHERE</code> filters rows; master <code>IN</code>, <code>BETWEEN</code>, <code>LIKE</code>, and <code>IS NULL</code>.</li>
+            <li><code>ORDER BY ... DESC</code> ranks results; sort by multiple columns when needed.</li>
+            <li><code>SELECT DISTINCT</code> reveals the unique values in a column.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l3-3", title:"Aggregating data: GROUP BY & HAVING", dur:"12 min read",
+        sub:"Turn millions of rows into the totals and averages people ask for.",
+        video:null,
+        body:`
+          <p>Managers rarely want raw rows — they want "total sales per region" or "average order value per month". <strong>Aggregate functions</strong> plus <code>GROUP BY</code> deliver exactly that. This is SQL's version of a PivotTable.</p>
+          <h3>The aggregate functions</h3>
+          <ul>
+            <li><code>COUNT(*)</code> — how many rows.</li>
+            <li><code>SUM(amount)</code> — add up a column.</li>
+            <li><code>AVG(amount)</code> — the average.</li>
+            <li><code>MIN</code> / <code>MAX</code> — smallest / largest.</li>
+          </ul>
+          <h3>GROUP BY — one result per category</h3>
+          <p>To get a total <em>per</em> region, group by region:</p>
+          <p><code>SELECT region, SUM(amount) AS total FROM orders GROUP BY region;</code></p>
+          <p>The rule of thumb: every column in your <code>SELECT</code> is either inside an aggregate function or listed in <code>GROUP BY</code>. <code>AS total</code> gives the new column a friendly name (an <em>alias</em>).</p>
+          <h3>HAVING — filter the groups</h3>
+          <p><code>WHERE</code> filters rows <em>before</em> grouping; <code>HAVING</code> filters the grouped results <em>after</em>:</p>
+          <p><code>SELECT region, SUM(amount) AS total FROM orders GROUP BY region HAVING SUM(amount) &gt; 10000;</code></p>
+          <div class="callout"><div><b>WHERE vs HAVING:</b> "show regions where total sales beat £10k" needs <code>HAVING</code>, because the total only exists after grouping. Use <code>WHERE</code> for raw-row conditions, <code>HAVING</code> for conditions on the aggregates.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Aggregates (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>) collapse many rows into one number.</li>
+            <li><code>GROUP BY</code> gives you that number per category — SQL's PivotTable.</li>
+            <li><code>WHERE</code> filters rows first; <code>HAVING</code> filters groups after.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l3-4", title:"Combining tables: JOINs", dur:"14 min read",
+        sub:"Stitch related tables together — the heart of relational data.",
+        video:null,
+        body:`
+          <p>Data is deliberately split across tables: customers in one, orders in another. A <strong>JOIN</strong> reconnects them on a shared key so you can answer questions that span both — "which customer placed each order?".</p>
+          <h3>The basic join</h3>
+          <p>Match each order to its customer using the key they share:</p>
+          <p><code>SELECT o.id, c.name, o.amount FROM orders o JOIN customers c ON o.customer_id = c.id;</code></p>
+          <p>Here <code>o</code> and <code>c</code> are short <em>aliases</em> for the tables, and <code>ON</code> states how the rows match up.</p>
+          <h3>The join types you'll actually use</h3>
+          <ul>
+            <li><strong>INNER JOIN</strong> — only rows that match in <em>both</em> tables. The default and most common.</li>
+            <li><strong>LEFT JOIN</strong> — every row from the left table, plus matches from the right (blanks where there's no match). Perfect for "all customers, including those who never ordered".</li>
+            <li><strong>RIGHT JOIN</strong> — the mirror image (used far less often).</li>
+            <li><strong>FULL JOIN</strong> — everything from both sides.</li>
+          </ul>
+          <h3>A complete, realistic query</h3>
+          <p>Joins combine naturally with everything you've learned:</p>
+          <p><code>SELECT c.country, SUM(o.amount) AS total FROM orders o JOIN customers c ON o.customer_id = c.id GROUP BY c.country ORDER BY total DESC;</code></p>
+          <div class="callout"><div><b>Picture it:</b> <code>INNER</code> keeps only the overlap between two circles; <code>LEFT</code> keeps the whole left circle. If a <code>LEFT JOIN</code> shows unexpected blanks, that's the data telling you those records have no match — often a useful finding in itself.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Joins reconnect tables on a shared key (<code>ON a.x = b.y</code>).</li>
+            <li><code>INNER</code> = matches only; <code>LEFT</code> = keep everything on the left.</li>
+            <li>Joins stack with <code>WHERE</code>, <code>GROUP BY</code>, and <code>ORDER BY</code> in one query.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l3-5", title:"Subqueries & CTEs", dur:"11 min read",
+        sub:"Build a query in readable steps instead of one tangled statement.",
+        video:null,
+        body:`
+          <p>Real questions often need an answer that depends on another answer — "orders above the average order value". You compute the average first, then compare. <strong>Subqueries</strong> and <strong>CTEs</strong> let you nest that logic cleanly.</p>
+          <h3>Subquery — a query inside a query</h3>
+          <p>Drop a query in parentheses wherever you'd put a value:</p>
+          <p><code>SELECT * FROM orders WHERE amount &gt; (SELECT AVG(amount) FROM orders);</code></p>
+          <p>The inner query produces the average; the outer query uses it. Subqueries are powerful but get hard to read once they nest more than a level or two.</p>
+          <h3>CTE — the readable alternative</h3>
+          <p>A <strong>Common Table Expression</strong> (<code>WITH</code>) names an intermediate result, so your query reads top-to-bottom like steps:</p>
+          <p><code>WITH regional AS ( SELECT region, SUM(amount) AS total FROM orders GROUP BY region ) SELECT * FROM regional WHERE total &gt; 10000;</code></p>
+          <p>First build <code>regional</code>, then query it. You can chain several CTEs, each building on the last — far easier to read, test, and debug than one giant nested statement.</p>
+          <div class="callout"><div><b>Reach for a CTE</b> the moment a query starts feeling tangled. Naming each step is the SQL equivalent of breaking a long formula into helper columns.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Subqueries let one query's result feed another.</li>
+            <li>CTEs (<code>WITH</code>) name intermediate steps for readable, layered logic.</li>
+            <li>Prefer CTEs once logic grows — clarity beats cleverness.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l3-6", title:"Window functions & query patterns", dur:"13 min read · full course",
+        sub:"Rankings, running totals, and the patterns that show up in real work.",
+        video:{id:"7S_tz1z_5bA", title:"SQL Tutorial for Beginners — Full Course", channel:"Programming with Mosh"},
+        body:`
+          <p><strong>Window functions</strong> are the skill that marks the jump from beginner to capable analyst. They calculate across a set of rows <em>without collapsing them</em> — so you keep every row <em>and</em> get the aggregate beside it.</p>
+          <h3>The OVER clause</h3>
+          <p>A running total of sales within each region, in date order:</p>
+          <p><code>SELECT region, date, amount, SUM(amount) OVER (PARTITION BY region ORDER BY date) AS running_total FROM orders;</code></p>
+          <p><code>PARTITION BY</code> restarts the calculation per group (like <code>GROUP BY</code>, but rows stay), and <code>ORDER BY</code> sets the running order.</p>
+          <h3>Ranking rows</h3>
+          <p><code>ROW_NUMBER()</code>, <code>RANK()</code>, and <code>DENSE_RANK()</code> number rows within a partition. To find each region's top order:</p>
+          <p><code>ROW_NUMBER() OVER (PARTITION BY region ORDER BY amount DESC)</code></p>
+          <p>Then keep where the number equals 1.</p>
+          <h3>Patterns worth memorising</h3>
+          <ul>
+            <li><strong>Top-N per group</strong> — window-rank, then filter to rank ≤ N.</li>
+            <li><strong>Running totals & moving averages</strong> — <code>SUM</code>/<code>AVG ... OVER (ORDER BY ...)</code>.</li>
+            <li><strong>Period-over-period</strong> — <code>LAG()</code> pulls the previous row's value to compare against.</li>
+          </ul>
+          <div class="callout"><div><b>Portfolio move:</b> take one public dataset, write a handful of joined, grouped, windowed queries that answer real questions, and save them in a GitHub repo with a short write-up. A tidy <code>.sql</code> file of clear queries is genuine proof of skill.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Window functions aggregate <em>without</em> dropping rows.</li>
+            <li><code>PARTITION BY</code> + <code>ORDER BY</code> drive running totals and rankings.</li>
+            <li>Top-N, running totals, and <code>LAG()</code> comparisons cover most real requests.</li>
+          </ul></div>
+        `
+      }
+    ]
   },
   {
-    id:"m4", num:"05", title:"Python", soon:true,
-    blurb:"Automate analysis and scale up with pandas — plus a first taste of stats.",
-    note:"Automate analysis and scale up with pandas, plus a first taste of statistics and forecasting.",
-    lessons:[]
+    id:"m4", num:"05", title:"Python", soon:false,
+    blurb:"Automate analysis and scale up with pandas — plus a first taste of statistics.",
+    lessons:[
+      {
+        id:"l4-1", title:"Python for analysts: setup & basics", dur:"14 min read · full course",
+        sub:"Why analysts use Python, notebooks, and just enough core syntax.",
+        video:{id:"rfscVS0vtbw", title:"Python Full Course for Beginners", channel:"freeCodeCamp"},
+        more:[{id:"_uQrJ0TkZlc", title:"Python for Beginners — Learn in 1 Hour", channel:"Programming with Mosh"}],
+        body:`
+          <p><strong>Python</strong> picks up where Excel and SQL leave off: automating repetitive work, handling data too big or too awkward for a spreadsheet, and reaching into statistics and forecasting. The good news — analysts only need a slice of the language.</p>
+          <h3>Where you'll write it</h3>
+          <p>Most analytics work happens in a <strong>Jupyter notebook</strong> (or VS Code / Google Colab) — a document where you run code in small cells and see the output right beneath each one. It's perfect for exploring data step by step. Install the free <strong>Anaconda</strong> distribution and you get Python, Jupyter, and the data libraries in one go.</p>
+          <h3>The core syntax you actually need</h3>
+          <ul>
+            <li><strong>Variables &amp; types:</strong> <code>price = 19.99</code> (number), <code>name = "Ada"</code> (text/string), <code>active = True</code> (boolean).</li>
+            <li><strong>Lists</strong> — an ordered collection: <code>regions = ["EU", "US", "APAC"]</code>.</li>
+            <li><strong>Dictionaries</strong> — labelled values: <code>row = {"name": "Ada", "amount": 120}</code>.</li>
+            <li><strong>Loops &amp; conditions:</strong> <code>for r in regions:</code> and <code>if amount &gt; 100:</code> to repeat work and make decisions.</li>
+            <li><strong>Functions</strong> — reusable blocks: <code>def total(a, b): return a + b</code>.</li>
+          </ul>
+          <div class="callout"><div><b>Don't aim for "knowing Python".</b> Aim to read data, clean it, group it, and chart it. That's a small, learnable corner of the language — and it's exactly what the next lessons cover.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Analysts write Python in notebooks, run cell by cell, and inspect output inline.</li>
+            <li>You only need variables, lists, dicts, loops, conditions, and functions to start.</li>
+            <li>Install Anaconda once and the whole data toolkit comes with it.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l4-2", title:"pandas fundamentals: Series & DataFrames", dur:"14 min read · video",
+        sub:"The one library that turns Python into a data powerhouse.",
+        video:{id:"vmEHCJofslg", title:"Complete Python Pandas Data Science Tutorial", channel:"Keith Galli"},
+        body:`
+          <p><strong>pandas</strong> is the library that makes Python feel like a programmable spreadsheet. Learn it and you can do everything Excel does — on far bigger data, repeatably.</p>
+          <h3>The two building blocks</h3>
+          <ul>
+            <li><strong>Series</strong> — a single column of data with an index.</li>
+            <li><strong>DataFrame</strong> — a whole table (rows × columns). This is what you'll work with constantly; think of it as a sheet you can command with code.</li>
+          </ul>
+          <h3>Loading and looking at data</h3>
+          <p>Convention is to import pandas as <code>pd</code>, then read a file straight into a DataFrame:</p>
+          <p><code>import pandas as pd</code><br><code>df = pd.read_csv("sales.csv")</code></p>
+          <p>Get your bearings with a few essential commands:</p>
+          <ul>
+            <li><code>df.head()</code> — the first few rows.</li>
+            <li><code>df.info()</code> — column names, types, and missing-value counts.</li>
+            <li><code>df.describe()</code> — quick stats (count, mean, min, max) for number columns.</li>
+            <li><code>df.shape</code> — how many rows and columns.</li>
+          </ul>
+          <h3>Selecting columns and rows</h3>
+          <ul>
+            <li><strong>A column:</strong> <code>df["amount"]</code>. Several: <code>df[["region", "amount"]]</code>.</li>
+            <li><strong>Filter rows</strong> by condition: <code>df[df["amount"] &gt; 100]</code>.</li>
+            <li><strong>By label:</strong> <code>df.loc[5, "amount"]</code>. <strong>By position:</strong> <code>df.iloc[5, 2]</code>.</li>
+          </ul>
+          <div class="callout"><div><b>Filtering reads oddly at first:</b> <code>df[df["amount"] &gt; 100]</code> means "give me the rows where the amount-column condition is true." You'll use this pattern hundreds of times — it quickly becomes second nature.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>A DataFrame is a spreadsheet you control with code.</li>
+            <li><code>read_csv</code> + <code>head</code>/<code>info</code>/<code>describe</code> is your first-look routine.</li>
+            <li><code>df[df["col"] &gt; x]</code> filters rows; <code>loc</code>/<code>iloc</code> pinpoint cells.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l4-3", title:"Cleaning data with pandas", dur:"13 min read",
+        sub:"The same cleaning you did in Excel — now repeatable in a few lines.",
+        video:null,
+        body:`
+          <p>Cleaning is still most of the job, but in pandas you write the steps once and re-run them on next month's file instantly. Here's the everyday cleaning toolkit.</p>
+          <h3>Missing values</h3>
+          <ul>
+            <li><strong>Find them:</strong> <code>df.isnull().sum()</code> counts blanks per column.</li>
+            <li><strong>Drop them:</strong> <code>df.dropna()</code> removes rows with blanks.</li>
+            <li><strong>Fill them:</strong> <code>df["region"].fillna("Unknown")</code> — but decide deliberately whether a blank means zero, unknown, or "drop the row".</li>
+          </ul>
+          <h3>Types, duplicates, and text</h3>
+          <ul>
+            <li><strong>Fix data types:</strong> <code>df["amount"] = df["amount"].astype(float)</code>; dates with <code>pd.to_datetime(df["date"])</code>.</li>
+            <li><strong>Remove duplicates:</strong> <code>df.drop_duplicates()</code>.</li>
+            <li><strong>Rename columns:</strong> <code>df.rename(columns={"amt": "amount"})</code>.</li>
+            <li><strong>Tidy text:</strong> <code>df["name"].str.strip()</code> (trim spaces), <code>.str.lower()</code>, <code>.str.title()</code> — the pandas echo of <code>TRIM</code> and <code>PROPER</code>.</li>
+          </ul>
+          <h3>Creating new columns</h3>
+          <p>Derive fields straight from others — fully vectorised, no dragging required:</p>
+          <p><code>df["with_tax"] = df["amount"] * 1.2</code></p>
+          <div class="callout"><div><b>Same instinct as Excel:</b> never overwrite your source. Keep the original CSV untouched and do all cleaning on the DataFrame in code, so every change is visible, repeatable, and reversible.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li><code>isnull().sum()</code> first, then decide drop vs fill — never guess silently.</li>
+            <li><code>astype</code>, <code>to_datetime</code>, and <code>drop_duplicates</code> handle most messes.</li>
+            <li>Written-once cleaning re-runs on new data with one click — pandas' big win.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l4-4", title:"Grouping, aggregating & merging", dur:"12 min read",
+        sub:"PivotTables and JOINs — now in Python.",
+        video:null,
+        body:`
+          <p>Everything you learned about PivotTables (Excel) and joins (SQL) carries straight over to pandas. Same ideas, code syntax.</p>
+          <h3>groupby — the PivotTable</h3>
+          <p>Total sales per region in one line:</p>
+          <p><code>df.groupby("region")["amount"].sum()</code></p>
+          <p>Several measures at once with <code>.agg()</code>:</p>
+          <p><code>df.groupby("region")["amount"].agg(["sum", "mean", "count"])</code></p>
+          <p>And for a quick frequency count of a category: <code>df["region"].value_counts()</code>.</p>
+          <h3>merge — the JOIN</h3>
+          <p>Combine two DataFrames on a shared key, exactly like SQL:</p>
+          <p><code>pd.merge(orders, customers, on="customer_id", how="left")</code></p>
+          <p>The <code>how</code> argument mirrors SQL: <code>"inner"</code>, <code>"left"</code>, <code>"right"</code>, <code>"outer"</code>.</p>
+          <h3>pivot_table — if you miss Excel</h3>
+          <p><code>df.pivot_table(index="region", columns="year", values="amount", aggfunc="sum")</code> produces a familiar cross-tab — the Rows/Columns/Values model in code.</p>
+          <div class="callout"><div><b>Three tools, one mental model:</b> "group by a category, summarise a number" is the same thought in Excel PivotTables, SQL <code>GROUP BY</code>, and pandas <code>groupby</code>. Learn it once; apply it everywhere.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li><code>groupby(...).agg(...)</code> is the PivotTable in Python.</li>
+            <li><code>pd.merge(..., how=...)</code> is the SQL JOIN in Python.</li>
+            <li><code>pivot_table</code> recreates the Excel cross-tab when you want it.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l4-5", title:"Visualising data in Python", dur:"11 min read",
+        sub:"From DataFrame to chart with matplotlib and seaborn.",
+        video:null,
+        body:`
+          <p>A finding needs a picture. Python's two main plotting libraries cover everything you'll need early on: <strong>matplotlib</strong> (the engine) and <strong>seaborn</strong> (prettier defaults, less code).</p>
+          <h3>The fastest chart</h3>
+          <p>pandas can plot directly:</p>
+          <p><code>df.groupby("region")["amount"].sum().plot(kind="bar")</code></p>
+          <p>Swap <code>kind</code> for the message: <code>"bar"</code> to compare, <code>"line"</code> for trends over time, <code>"scatter"</code> for relationships, <code>"hist"</code> for distributions.</p>
+          <h3>matplotlib for control</h3>
+          <p>Import it as <code>plt</code> and add the labels that make a chart honest and readable:</p>
+          <p><code>import matplotlib.pyplot as plt</code><br><code>plt.title("Sales by region")</code> · <code>plt.xlabel("Region")</code> · <code>plt.show()</code></p>
+          <h3>seaborn for polish</h3>
+          <p>seaborn makes attractive statistical charts in a line: <code>sns.barplot(data=df, x="region", y="amount")</code>, plus <code>boxplot</code>, <code>histplot</code>, and <code>heatmap</code> for correlations.</p>
+          <div class="callout"><div><b>The rules don't change with the tool:</b> match the chart to the message, start bar axes at zero, label clearly, and remove clutter. A clean Python chart follows the exact same principles as a clean Excel one.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li><code>.plot(kind=...)</code> straight off a DataFrame is the quickest route to a chart.</li>
+            <li>matplotlib gives fine control; seaborn gives polish with less code.</li>
+            <li>Good-chart principles carry over from Excel unchanged.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l4-6", title:"From notebook to project (+ a taste of stats)", dur:"12 min read",
+        sub:"Tie it all together and add the statistics that keep you honest.",
+        video:null,
+        body:`
+          <p>You now have every layer: read, clean, group, merge, and chart. The final step is combining them into a project — and adding just enough statistics to trust your conclusions.</p>
+          <h3>A first taste of statistics</h3>
+          <ul>
+            <li><strong>Centre &amp; spread:</strong> <code>df["amount"].mean()</code>, <code>.median()</code>, <code>.std()</code>. The median resists outliers; the mean doesn't.</li>
+            <li><strong>Distribution:</strong> a histogram shows the <em>shape</em> a single average hides.</li>
+            <li><strong>Correlation:</strong> <code>df.corr()</code> shows how columns move together, from -1 to +1.</li>
+          </ul>
+          <div class="callout"><div><b>The golden caveat:</b> correlation is not causation. Two things rising together (ice-cream sales and sunburns) often share a hidden cause (summer). State relationships carefully — it's what separates a trustworthy analyst from a misleading chart.</div></div>
+          <h3>Structure a portfolio project</h3>
+          <p>Build a notebook that tells a complete story, in this order:</p>
+          <ul>
+            <li><strong>1. The question</strong> — one clear business question up top.</li>
+            <li><strong>2. The data &amp; cleaning</strong> — load it, show the cleaning steps, explain your choices.</li>
+            <li><strong>3. The analysis</strong> — group, merge, and explore toward the answer.</li>
+            <li><strong>4. The visuals</strong> — a few clear charts that carry the finding.</li>
+            <li><strong>5. The "so what"</strong> — a short paragraph: what you found and what to do about it.</li>
+          </ul>
+          <p>Push it to GitHub and write it up on LinkedIn. That single, end-to-end notebook is the strongest thing you can show an employer.</p>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Mean, median, std, and <code>corr()</code> are enough statistics to start reasoning honestly.</li>
+            <li>Correlation ≠ causation — always look for a hidden third factor.</li>
+            <li>A question → cleaning → analysis → visuals → "so what" notebook is a complete portfolio piece.</li>
+          </ul></div>
+        `
+      }
+    ]
   }
 ];
 
@@ -977,10 +1306,10 @@ function renderHome(){
       <div class="hero-l">
         <span class="eyebrow">Data analytics · from zero</span>
         <h1>Turn raw data into<br><em>decisions people trust.</em></h1>
-        <p class="lead">A guided track that starts with the career itself, then teaches you <strong>Excel</strong> and <strong>Power BI</strong> hands-on — full written lessons paired with the best video tutorials on the web. SQL and Python are on the way.</p>
+        <p class="lead">A guided track that starts with the career itself, then takes you all the way through <strong>Excel</strong>, <strong>Power BI</strong>, <strong>SQL</strong>, and <strong>Python</strong> — full written lessons paired with the best video tutorials on the web, from your first spreadsheet to your first portfolio project.</p>
         <div class="cta-row">
           <button class="cta" id="startBtn">${started?'Continue learning':'Start the track'} <span class="arr">→</span></button>
-          <span class="cta-note">${started?`${doneCount()}/${totalLessons()} done · ${pct}%`:`${totalLessons()} lessons · 3 modules live`}</span>
+          <span class="cta-note">${started?`${doneCount()}/${totalLessons()} done · ${pct}%`:`${totalLessons()} lessons · ${COURSE.filter(m=>!m.soon).length} modules`}</span>
         </div>
       </div>
       <div class="hero-r" aria-hidden="true">
@@ -1136,7 +1465,7 @@ function toggleDone(id, next){
       up.classList.add('show');
       const g=$("#goNext"); if(g) g.addEventListener('click',e=>{e.preventDefault();openLesson(next.id);});
     }else if(becoming && !next){
-      up.innerHTML=`<span>✓ That's every live lesson done. SQL and Python are on the way — build a portfolio project with what you've learned.</span>`;
+      up.innerHTML=`<span>✓ That's the whole track done — Foundations, Excel, Power BI, SQL, and Python. Now go build a portfolio project with it.</span>`;
       up.classList.add('show');
     }else{
       up.classList.remove('show'); up.innerHTML='';
