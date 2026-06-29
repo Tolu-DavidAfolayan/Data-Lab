@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DATA LAB — Learn Data Analytics</title>
+<meta name="description" content="A guided track that takes you from zero to job-ready in data analytics — Excel and Power BI, hands-on, with the best video tutorials on the web." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.ytimg.com">
+<link rel="preconnect" href="https://www.youtube-nocookie.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* "Instrument" palette — warm paper, ink, one confident cobalt, gold highlight, green for done only */
+    --paper:#F4F2EC;
+    --surface:#FFFFFF;
+    --surface-2:#FBFAF6;
+    --ink:#16181D;
+    --muted:#5E6473;
+    --faint:#9A958A;
+    --line:#E4E0D5;
+    --line-strong:#D6D1C4;
+    --accent:#2A43E8;        /* cobalt — the "signal/decision" colour */
+    --accent-deep:#1B2BB8;
+    --accent-wash:#EAEDFD;
+    --gold:#D9982B;          /* highlight / in-progress */
+    --gold-wash:#FBF1DC;
+    --done:#1E9E63;          /* completion only */
+    --done-wash:#E2F4EA;
+    --grid:rgba(42,67,232,.05);
+    --shadow-sm:0 1px 0 rgba(22,24,29,.04), 0 1px 2px rgba(22,24,29,.05);
+    --shadow:0 1px 0 rgba(22,24,29,.03), 0 12px 36px -16px rgba(22,24,29,.22);
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    /* graph-paper: the analyst's worksheet */
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:30px 30px;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.62;
+    font-size:16px;
+  }
+  a{color:var(--accent)}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .display{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+
+  /* ---------------- Top bar ---------------- */
+  header.top{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;gap:18px;
+    padding:0 22px;height:60px;
+    background:rgba(244,242,236,.82);
+    backdrop-filter:saturate(1.2) blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+  .logo{width:30px;height:30px;flex:none;display:block}
+  .wordmark{font-family:'Bricolage Grotesque';font-weight:800;letter-spacing:-.01em;font-size:1.12rem;line-height:1}
+  .wordmark b{color:var(--accent);font-weight:800}
+  .top .tag{font-family:'JetBrains Mono';font-size:.68rem;letter-spacing:.02em;color:var(--faint);border-left:1px solid var(--line-strong);padding-left:16px}
+  .top .spacer{flex:1}
+  .progress-pill{
+    display:flex;align-items:center;gap:11px;
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:999px;padding:6px 7px 6px 14px;
+  }
+  .progress-pill .frac{font-family:'JetBrains Mono';font-size:.74rem;color:var(--muted);white-space:nowrap}
+  .progress-pill .frac b{color:var(--ink);font-weight:600}
+  .progress-pill .track{width:78px;height:6px;border-radius:99px;background:#E7E3D8;overflow:hidden}
+  .progress-pill .fill{display:block;height:100%;width:0;background:var(--done);transition:width .55s cubic-bezier(.2,.8,.2,1)}
+  .progress-pill.pulse{animation:pillpulse .6s ease}
+  @keyframes pillpulse{0%{box-shadow:0 0 0 0 var(--done-wash)}60%{box-shadow:0 0 0 7px rgba(30,158,99,0)}100%{box-shadow:0 0 0 0 rgba(30,158,99,0)}}
+  .btn-reset{
+    border:1px solid var(--line);background:var(--surface);color:var(--muted);
+    border-radius:999px;padding:7px 13px;font-size:.72rem;cursor:pointer;font-family:'JetBrains Mono'
+  }
+  .btn-reset:hover{color:var(--ink);border-color:var(--line-strong)}
+  .menu-toggle{display:none;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);width:38px;height:36px;cursor:pointer}
+  .menu-toggle svg{display:block;margin:auto}
+
+  /* reading progress (lesson only) */
+  .read-bar{position:fixed;left:0;top:60px;height:2px;width:100%;z-index:49;background:transparent;pointer-events:none}
+  .read-bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .08s linear}
+
+  /* ---------------- Layout ---------------- */
+  .shell{display:grid;grid-template-columns:288px minmax(0,1fr);max-width:1240px;margin:0 auto;align-items:start}
+
+  /* ---------------- Sidebar / pipeline spine ---------------- */
+  aside{
+    position:sticky;top:60px;align-self:start;
+    height:calc(100vh - 60px);overflow-y:auto;
+    padding:24px 14px 60px 24px;
+    border-right:1px solid var(--line);
+    background:linear-gradient(90deg, rgba(255,255,255,.35), transparent 60%);
+  }
+  .spine-head{font-family:'JetBrains Mono';font-size:.64rem;letter-spacing:.18em;color:var(--faint);text-transform:uppercase;margin:4px 0 18px 2px}
+  .module{position:relative;padding-left:28px;margin-bottom:4px}
+  .module::before{content:"";position:absolute;left:10px;top:27px;bottom:-4px;width:1.5px;background:var(--line-strong)}
+  .module:last-child::before{display:none}
+  .module.done::before{background:var(--done)}
+  .node{
+    position:absolute;left:3px;top:7px;width:15px;height:15px;border-radius:50%;
+    border:1.5px solid var(--line-strong);background:var(--surface);z-index:2;transition:.3s;
+  }
+  .module.done .node{background:var(--done);border-color:var(--done)}
+  .module.done .node::after{content:"";position:absolute;left:4px;top:1.5px;width:4px;height:7px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+  .module.active .node{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-wash)}
+  .module.soon .node{border-style:dashed;border-color:var(--gold)}
+  .m-title{
+    display:flex;align-items:center;gap:9px;width:100%;text-align:left;cursor:pointer;
+    background:none;border:none;padding:6px 8px;border-radius:var(--radius);
+    font-family:'Bricolage Grotesque';font-weight:600;font-size:.95rem;color:var(--ink);
+  }
+  .m-title:hover{background:rgba(42,67,232,.06)}
+  .m-title .mnum{font-family:'JetBrains Mono';font-size:.66rem;color:var(--accent);font-weight:600;padding-top:1px}
+  .module.soon .m-title .mnum{color:var(--gold)}
+  .m-title .soon-tag{font-family:'JetBrains Mono';font-size:.58rem;background:var(--gold-wash);color:#9a6c14;padding:2px 7px;border-radius:99px;margin-left:auto;letter-spacing:.04em}
+  .m-count{margin-left:auto;font-family:'JetBrains Mono';font-size:.64rem;color:var(--faint)}
+  .module.done .m-count{color:var(--done)}
+  .lessons{list-style:none;margin:0 0 8px;padding:0}
+  .lessons li{margin:1px 0}
+  .lessons button{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+    background:none;border:none;padding:7px 9px;border-radius:var(--radius);font-size:.84rem;color:var(--muted);font-family:'Inter';line-height:1.35;
+  }
+  .lessons button:hover{background:rgba(42,67,232,.06);color:var(--ink)}
+  .lessons button.current{background:var(--ink);color:#fff}
+  .lessons button.current .tick{border-color:rgba(255,255,255,.5)}
+  .tick{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--line-strong);flex:none;display:grid;place-items:center;font-size:.6rem;color:#fff;margin-top:1px}
+  .lessons button .tick.checked{background:var(--done);border-color:var(--done)}
+  .lessons button .tick.checked::after{content:"";width:4px;height:7px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg);margin-bottom:1px}
+  .lessons button.current .tick.checked{background:var(--done);border-color:var(--done)}
+
+  /* ---------------- Main ---------------- */
+  main{padding:30px 36px 96px;min-width:0}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+  .view-enter{animation:viewIn .4s cubic-bezier(.2,.8,.2,1)}
+  @keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------------- Hero ---------------- */
+  .hero{position:relative;overflow:hidden;margin-bottom:22px;display:grid;grid-template-columns:1.15fr .85fr;gap:0}
+  .hero-l{padding:42px 38px 38px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono';font-size:.7rem;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--accent)}
+  .hero h1{font-family:'Bricolage Grotesque';font-weight:800;font-size:3rem;line-height:1.02;margin:16px 0 14px;letter-spacing:-.02em}
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero p.lead{font-size:1.04rem;color:var(--muted);max-width:46ch;margin:0}
+  .hero .cta-row{margin-top:28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .cta{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:'Bricolage Grotesque';font-weight:600;font-size:.98rem;padding:14px 22px;border-radius:var(--radius);transition:.16s}
+  .cta:hover{background:var(--accent-deep);transform:translateY(-1px)}
+  .cta .arr{transition:transform .16s}
+  .cta:hover .arr{transform:translateX(3px)}
+  .cta-note{font-family:'JetBrains Mono';font-size:.72rem;color:var(--faint)}
+
+  /* hero signature: self-plotting chart on graph paper */
+  .hero-r{position:relative;border-left:1px solid var(--line);background:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px),var(--surface-2);
+    background-size:24px 24px,24px 24px,auto;min-height:300px}
+  .plot{position:absolute;inset:0;width:100%;height:100%}
+  .plot .axis{stroke:var(--line-strong);stroke-width:1}
+  .plot .bar{fill:var(--accent-wash);stroke:var(--accent);stroke-width:1.5}
+  .plot .bar.hi{fill:var(--accent)}
+  .plot .trend{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .plot .dot{fill:var(--surface);stroke:var(--gold);stroke-width:2.5}
+  .plot .dot.last{fill:var(--gold)}
+  .plot .ptag{font-family:'JetBrains Mono';font-size:11px;fill:var(--muted)}
+  .plot .ptag b{fill:var(--ink);font-weight:600}
+  .plot .insight{font-family:'Bricolage Grotesque';font-weight:700;font-size:15px;fill:var(--ink)}
+  @keyframes growbar{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  @keyframes drawline{to{stroke-dashoffset:0}}
+  @keyframes popdot{0%{opacity:0;transform:scale(0)}60%{transform:scale(1.35)}100%{opacity:1;transform:scale(1)}}
+  @keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .anim .bar{transform-box:fill-box;transform-origin:bottom;animation:growbar .7s cubic-bezier(.2,.8,.2,1) both}
+  .anim .trend{stroke-dasharray:520;stroke-dashoffset:520;animation:drawline 1.1s ease .5s forwards}
+  .anim .dot{transform-box:fill-box;transform-origin:center;opacity:0;animation:popdot .4s cubic-bezier(.2,1.4,.4,1) both}
+  .anim .insight,.anim .ptag{opacity:0;animation:fadeup .5s ease both}
+
+  /* module cards */
+  .mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px}
+  .mcard{position:relative;display:flex;flex-direction:column;padding:20px 20px 18px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:.16s;font-family:inherit;color:inherit;min-height:158px}
+  .mcard:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .mcard.is-soon{cursor:default}
+  .mcard.is-soon:hover{border-color:var(--gold);transform:none;box-shadow:none}
+  .mcard .mc-kick{font-family:'JetBrains Mono';font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  .mcard.is-soon .mc-kick{color:#9a6c14}
+  .mcard .mc-title{font-family:'Bricolage Grotesque';font-weight:700;font-size:1.16rem;margin:9px 0 7px;letter-spacing:-.01em}
+  .mcard .mc-desc{color:var(--muted);font-size:.88rem;margin:0;flex:1}
+  .mcard .mc-foot{display:flex;align-items:center;gap:8px;margin-top:14px;font-family:'JetBrains Mono';font-size:.72rem;color:var(--accent)}
+  .mcard.is-soon .mc-foot{color:#9a6c14}
+  .mcard .mc-prog{position:absolute;right:18px;top:18px;font-family:'JetBrains Mono';font-size:.66rem;color:var(--faint)}
+  .mcard .mc-prog.full{color:var(--done)}
+  .pin{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:var(--radius) 0 0 var(--radius);opacity:0;transition:.16s}
+  .mcard:hover .pin{opacity:1}
+  .mcard.is-soon .pin{background:var(--gold)}
+
+  /* ---------------- Lesson view ---------------- */
+  .lesson{padding:32px 40px 38px}
+  .crumb{display:flex;align-items:center;gap:11px;flex-wrap:wrap;font-family:'JetBrains Mono';font-size:.7rem;letter-spacing:.06em;color:var(--accent);text-transform:uppercase}
+  .crumb .sep{color:var(--line-strong)}
+  .crumb .pos{color:var(--faint)}
+  .crumb .dur{color:var(--faint);text-transform:none;letter-spacing:0}
+  .lesson h2{font-family:'Bricolage Grotesque';font-weight:800;font-size:2.15rem;line-height:1.08;margin:14px 0 8px;letter-spacing:-.02em;outline:none}
+  .lesson .sub{color:var(--muted);margin:0 0 26px;font-size:1.04rem;max-width:62ch}
+
+  /* video component (facade -> inline, graceful fallback) */
+  .video{position:relative;width:100%;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong);background:radial-gradient(120% 120% at 30% 20%,#1d2030,#0c0e16)}
+  .video iframe{position:absolute;inset:0;width:100%!important;height:100%!important;border:0}
+  .facade{position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;margin:0;cursor:pointer;background:none;display:block;color:#fff;text-align:left}
+  .fac-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .fac-grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,12,20,.05) 0%,rgba(10,12,20,.15) 45%,rgba(10,12,20,.78) 100%)}
+  .fac-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(42,67,232,.92);display:grid;place-items:center;box-shadow:0 8px 28px rgba(0,0,0,.4);transition:.18s}
+  .fac-play::after{content:"";border-style:solid;border-width:11px 0 11px 18px;border-color:transparent transparent transparent #fff;margin-left:4px}
+  .facade:hover .fac-play{transform:translate(-50%,-50%) scale(1.08);background:var(--accent)}
+  .fac-meta{position:absolute;left:18px;right:18px;bottom:16px}
+  .fac-meta b{display:block;font-family:'Bricolage Grotesque';font-weight:600;font-size:1.02rem;line-height:1.25;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+  .fac-meta i{display:block;font-style:normal;font-family:'JetBrains Mono';font-size:.7rem;opacity:.85;margin-top:4px}
+  .fac-tag{position:absolute;left:16px;top:14px;font-family:'JetBrains Mono';font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(0,0,0,.45);padding:5px 9px;border-radius:99px;backdrop-filter:blur(4px)}
+
+  /* fallback card (video unavailable / embedding disabled) */
+  .video.is-fallback{background:var(--surface-2);border-color:var(--line)}
+  .vf-card{position:absolute;inset:0;display:flex;color:var(--ink)}
+  .vf-thumb{width:42%;background:#0c0e16 center/cover no-repeat;flex:none}
+  .vf-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:22px 26px}
+  .vf-kicker{font-family:'JetBrains Mono';font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .vf-title{font-family:'Bricolage Grotesque';font-weight:700;font-size:1.12rem;margin:8px 0 3px;line-height:1.25}
+  .vf-chan{font-family:'JetBrains Mono';font-size:.74rem;color:var(--muted)}
+  .vf-actions{display:flex;align-items:center;gap:16px;margin-top:18px;flex-wrap:wrap}
+  .vf-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;text-decoration:none;font-family:'Bricolage Grotesque';font-weight:600;font-size:.9rem;padding:11px 17px;border-radius:var(--radius)}
+  .vf-btn:hover{background:var(--accent-deep)}
+  .vf-link{font-family:'JetBrains Mono';font-size:.76rem;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:1px}
+  .vf-link:hover{color:var(--ink)}
+
+  .video-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 2px 32px}
+  .video-meta .vm-info{font-family:'JetBrains Mono';font-size:.75rem;color:var(--muted)}
+  .video-meta .vm-info b{color:var(--ink);font-weight:600}
+  .yt-out{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:.74rem;text-decoration:none;color:var(--accent);border:1px solid var(--line);padding:8px 13px;border-radius:var(--radius);white-space:nowrap}
+  .yt-out:hover{background:var(--accent-wash);border-color:var(--accent)}
+
+  /* reading body */
+  .reading{font-size:1.04rem;color:#272b34;max-width:70ch}
+  .reading h3{font-family:'Bricolage Grotesque';font-weight:700;font-size:1.3rem;margin:32px 0 10px;color:var(--ink);letter-spacing:-.01em}
+  .reading p{margin:0 0 15px}
+  .reading ul{margin:0 0 16px;padding-left:0;list-style:none}
+  .reading li{position:relative;margin:9px 0;padding-left:24px}
+  .reading li::before{content:"";position:absolute;left:4px;top:.66em;width:7px;height:7px;background:var(--accent-wash);border:1.5px solid var(--accent);border-radius:2px}
+  .reading strong{color:var(--ink);font-weight:600}
+  .reading em{color:var(--accent-deep);font-style:normal;font-weight:500}
+  .reading code{font-family:'JetBrains Mono';font-size:.84em;background:var(--accent-wash);padding:2px 6px;border-radius:3px;color:var(--accent-deep)}
+  .callout{display:flex;gap:13px;border:1px solid var(--gold);background:var(--gold-wash);padding:15px 18px;border-radius:var(--radius);margin:22px 0;font-size:.97rem;color:#5b4413}
+  .callout::before{content:"!";font-family:'Bricolage Grotesque';font-weight:800;color:#fff;background:var(--gold);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:.82rem;margin-top:1px}
+  .callout b{font-family:'Bricolage Grotesque';color:#7a5a11}
+  .keypoints{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--done);border-radius:var(--radius);padding:18px 22px;margin:26px 0}
+  .keypoints .kp-head{font-family:'JetBrains Mono';font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--done);margin-bottom:10px}
+  .keypoints ul{margin:0}
+  .keypoints li::before{background:var(--done-wash);border-color:var(--done)}
+
+  /* more videos */
+  .more-videos{margin:30px 0 4px;max-width:none}
+  .mv-head{font-family:'JetBrains Mono';font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:13px}
+  .mv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:14px}
+  .mv-item{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface);transition:.16s}
+  .mv-item:hover{border-color:var(--accent)}
+  .mv-item .video{border:0;border-radius:0;border-bottom:1px solid var(--line)}
+  .mv-item .fac-meta{display:none}
+  .mv-item .fac-play{width:46px;height:46px}
+  .mv-item .fac-play::after{border-width:8px 0 8px 13px}
+  .mv-body{padding:12px 14px}
+  .mv-t{font-family:'Inter';font-weight:600;font-size:.86rem;line-height:1.3;color:var(--ink)}
+  .mv-c{font-family:'JetBrains Mono';font-size:.68rem;color:var(--faint);margin-top:6px}
+
+  /* footer nav */
+  .lesson-foot{margin-top:38px;padding-top:24px;border-top:1px solid var(--line)}
+  .upnext{display:none;align-items:center;gap:10px;font-family:'JetBrains Mono';font-size:.76rem;color:var(--muted);margin-bottom:18px;background:var(--done-wash);border:1px solid #bfe6cf;padding:11px 15px;border-radius:var(--radius)}
+  .upnext.show{display:flex;animation:fadeup .35s ease}
+  .upnext b{color:var(--ink)}
+  .upnext a{margin-left:auto;color:var(--accent);text-decoration:none;font-weight:600}
+  .foot-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .mark-btn{display:inline-flex;align-items:center;gap:10px;border:none;cursor:pointer;font-family:'Bricolage Grotesque';font-weight:600;font-size:.94rem;padding:13px 20px;border-radius:var(--radius);background:var(--done);color:#fff;transition:.16s}
+  .mark-btn:hover{filter:brightness(.96)}
+  .mark-btn .box{width:17px;height:17px;border:2px solid rgba(255,255,255,.85);border-radius:4px;display:grid;place-items:center}
+  .mark-btn.is-done{background:var(--done-wash);color:#0e7a4c}
+  .mark-btn.is-done .box{border-color:#0e7a4c;background:#0e7a4c}
+  .mark-btn.is-done .box::after{content:"";width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin-bottom:2px}
+  .mark-btn.celebrate{animation:pop .4s ease}
+  @keyframes pop{40%{transform:scale(1.05)}}
+  .nav-btns{display:flex;gap:10px;margin-left:auto}
+  .nav-btns button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-family:'Inter';font-weight:500;font-size:.86rem;padding:11px 16px;border-radius:var(--radius)}
+  .nav-btns button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  .nav-btns button:disabled{opacity:.38;cursor:default}
+  .kbd-hint{margin-top:20px;font-family:'JetBrains Mono';font-size:.68rem;color:var(--faint);display:flex;gap:18px;flex-wrap:wrap}
+  .kbd-hint kbd{font-family:'JetBrains Mono';background:var(--surface);border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;padding:1px 6px;color:var(--muted);font-size:.66rem}
+
+  /* soon panel */
+  .soon-panel{padding:54px 40px;text-align:center}
+  .soon-panel .chip{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:.7rem;background:var(--gold-wash);color:#9a6c14;padding:6px 13px;border-radius:99px;letter-spacing:.06em}
+  .soon-panel .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:1.9rem;margin:16px 0 8px;letter-spacing:-.02em}
+  .soon-panel p{color:var(--muted);max-width:48ch;margin:0 auto}
+
+  :focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:3px}
+  .backdrop{display:none}
+
+  @media (max-width:920px){
+    .shell{grid-template-columns:1fr}
+    aside{position:fixed;left:0;top:0;height:100vh;width:300px;z-index:70;background:var(--paper);transform:translateX(-100%);transition:transform .25s ease;border-right:1px solid var(--line);padding-top:18px}
+    body.nav-open aside{transform:translateX(0)}
+    body.nav-open .backdrop{display:block;position:fixed;inset:0;background:rgba(22,24,29,.42);z-index:65}
+    .menu-toggle{display:grid}
+    .read-bar{top:60px}
+    .hero{grid-template-columns:1fr}
+    .hero-r{min-height:230px;border-left:0;border-top:1px solid var(--line);order:2}
+    .hero-l{order:1;padding:30px 24px 26px}
+    .hero h1{font-size:2.3rem}
+    main{padding:24px 18px 80px}
+    .lesson{padding:24px 20px 30px}
+    .top .tag{display:none}
+    .vf-thumb{display:none}
+  }
+  @media (max-width:560px){
+    .progress-pill .track{width:54px}
+    .progress-pill .frac{display:none}
+    .hero h1{font-size:1.95rem}
+    .lesson h2{font-size:1.65rem}
+    .mod-grid{grid-template-columns:1fr}
+    .vf-card{flex-direction:column}
+    .vf-body{padding:18px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;scroll-behavior:auto!important}
+    .anim .bar,.anim .trend,.anim .dot,.anim .insight,.anim .ptag{animation:none!important;opacity:1!important;stroke-dashoffset:0!important;transform:none!important}
+    .view-enter{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="menu-toggle" id="menuToggle" aria-label="Open lessons menu" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="#16181D" stroke-width="1.6" stroke-linecap="round"/></svg>
+  </button>
+  <a class="brand" href="#" id="homeLink" aria-label="DATA LAB home">
+    <svg class="logo" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+      <rect x="1" y="1" width="28" height="28" rx="5" fill="#fff" stroke="#E4E0D5"/>
+      <rect x="6" y="17" width="3.4" height="7" rx="1" fill="#2A43E8" opacity=".35"/>
+      <rect x="11.3" y="13" width="3.4" height="11" rx="1" fill="#2A43E8" opacity=".55"/>
+      <rect x="16.6" y="15" width="3.4" height="9" rx="1" fill="#2A43E8" opacity=".4"/>
+      <rect x="21.9" y="9" width="3.4" height="15" rx="1" fill="#2A43E8"/>
+      <polyline points="7.7,15 13,11 18.3,13 23.6,7" stroke="#16181D" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="23.6" cy="7" r="2.1" fill="#D9982B"/>
+    </svg>
+    <span class="wordmark">DATA<b>LAB</b></span>
+  </a>
+  <span class="tag">excel · power bi · career track</span>
+  <span class="spacer"></span>
+  <div class="progress-pill" id="progPill" title="Your course progress" aria-label="Course progress">
+    <span class="frac"><b id="fracDone">0</b>/<span id="fracTotal">0</span> lessons</span>
+    <span class="track"><span class="fill" id="pctFill"></span></span>
+  </div>
+  <button class="btn-reset" id="resetBtn">reset</button>
+</header>
+
+<div class="read-bar" id="readBar" aria-hidden="true"><span id="readFill"></span></div>
+<div class="backdrop" id="backdrop"></div>
+
+<div class="shell">
+  <aside id="sidebar" aria-label="Curriculum">
+    <div class="spine-head">Curriculum pipeline</div>
+    <div id="spine"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ============================================================
+   DATA LAB — curriculum data
+   Each lesson may have a primary `video` and extra `more` videos.
+   Video IDs are matched to topic + channel; the player degrades
+   gracefully to a "Watch on YouTube" card if any video can't embed.
+   ============================================================ */
+const COURSE = [
+  {
+    id:"m0", num:"01", title:"Career Foundations", soon:false,
+    blurb:"What the job is, what the work feels like, and a realistic path in.",
+    lessons:[
+      {
+        id:"l0-1", title:"What is data analytics?", dur:"12 min read · 15 min video",
+        sub:"The field, why companies pay for it, and where you fit in.",
+        video:{id:"yZvFH7B6gKI", title:"What Is Data Analytics? — An Introduction", channel:"CareerFoundry"},
+        body:`
+          <p><strong>Data analytics</strong> is the practice of taking raw, messy information and turning it into answers people can act on. Every time a company asks "which product sells best in winter?", "why did sign-ups drop last week?", or "where should we open the next store?", an analyst is the person who finds the evidence and explains it in plain language.</p>
+          <h3>Why this is one of the most in-demand skills</h3>
+          <p>Organisations now collect more data than they can possibly read by hand — sales records, website clicks, support tickets, sensor readings. That data is worthless until someone shapes it into a decision. That someone is the data analyst, and the demand for the role keeps growing across finance, healthcare, retail, sport, government, and tech.</p>
+          <h3>What "analytics" actually covers</h3>
+          <ul>
+            <li><strong>Collecting</strong> data from spreadsheets, databases, and apps.</li>
+            <li><strong>Cleaning</strong> it so it's accurate and consistent — usually the biggest part of the job.</li>
+            <li><strong>Analysing</strong> it to find patterns, trends, and relationships.</li>
+            <li><strong>Visualising &amp; communicating</strong> the result so a non-technical manager can act on it.</li>
+          </ul>
+          <div class="callout"><div><b>Mindset shift:</b> analytics is not about memorising tools. It's about <em>asking a sharp question and proving the answer with data</em>. The tools (Excel, Power BI, SQL, Python) are just how you do it faster.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Analytics = raw data → trustworthy decisions.</li>
+            <li>The value you create is <em>better, faster decisions</em>, not pretty charts.</li>
+            <li>You don't need a maths or computer-science degree to start.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l0-2", title:"A day in the life of a data analyst", dur:"8 min read · 12 min video",
+        sub:"What the work really looks like, beyond the job title.",
+        video:{id:"uSTtLpstV-o", title:"A Day in the Life of a Data Analyst", channel:"CareerFoundry"},
+        more:[{id:"qnnuZbHKcfY", title:"Data Analyst Job Overview (Day in the Life)", channel:"Luke Barousse"}],
+        body:`
+          <p>A common myth is that analysts spend the day building dazzling dashboards. In reality, the work is a loop of small, practical steps repeated on different problems.</p>
+          <h3>A realistic day</h3>
+          <ul>
+            <li><strong>Morning:</strong> check that yesterday's reports ran correctly, answer a few "can you pull these numbers?" requests from other teams.</li>
+            <li><strong>Midday:</strong> dig into a real question — say, "why did refunds spike?" — by pulling data, cleaning it, and slicing it different ways.</li>
+            <li><strong>Afternoon:</strong> build or update a report/dashboard, then meet stakeholders to walk them through what the data says and what they should do next.</li>
+          </ul>
+          <h3>The skills that actually matter day to day</h3>
+          <ul>
+            <li><strong>Curiosity:</strong> the best analysts keep asking "but why?" until the root cause appears.</li>
+            <li><strong>Communication:</strong> a brilliant analysis nobody understands is worth nothing.</li>
+            <li><strong>Attention to detail:</strong> one wrong filter can mislead a whole company.</li>
+            <li><strong>Patience with messy data:</strong> expect to spend more time cleaning than charting.</li>
+          </ul>
+          <div class="callout"><div><b>Reality check:</b> roughly 60–70% of an analyst's time goes to finding, cleaning, and preparing data. Get comfortable with that and you're already ahead.</div></div>
+        `
+      },
+      {
+        id:"l0-3", title:"Types of analytics & the analysis workflow", dur:"10 min read",
+        sub:"The four kinds of analytics and the repeatable 6-step process.",
+        video:null,
+        body:`
+          <p>Every analytics question fits somewhere on a ladder of difficulty and value. Knowing where a request sits tells you what tools and effort it needs.</p>
+          <h3>The four types of analytics</h3>
+          <ul>
+            <li><strong>Descriptive — "What happened?"</strong> Summaries of the past. Total sales last quarter, average order value. (Excel &amp; Power BI shine here.)</li>
+            <li><strong>Diagnostic — "Why did it happen?"</strong> Drilling into causes. Sales fell — was it a region, a product, a price change?</li>
+            <li><strong>Predictive — "What will happen?"</strong> Using patterns to forecast. Likely demand next month. (Stats &amp; Python territory.)</li>
+            <li><strong>Prescriptive — "What should we do?"</strong> Recommending an action. Which discount maximises profit.</li>
+          </ul>
+          <p>As a beginner you'll live mostly in <strong>descriptive</strong> and <strong>diagnostic</strong> analytics — which is exactly what Excel and Power BI are built for.</p>
+          <h3>The data analysis process (6 steps)</h3>
+          <ul>
+            <li><strong>1. Ask</strong> — define the question and what a good answer looks like.</li>
+            <li><strong>2. Prepare / collect</strong> — gather the right data from the right sources.</li>
+            <li><strong>3. Clean</strong> — fix errors, duplicates, blanks, and inconsistent formats.</li>
+            <li><strong>4. Analyse</strong> — explore, calculate, and find the pattern.</li>
+            <li><strong>5. Visualise</strong> — turn the finding into a clear chart or dashboard.</li>
+            <li><strong>6. Share &amp; act</strong> — tell the story and recommend a next step.</li>
+          </ul>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Match effort to the question type — not everything needs prediction.</li>
+            <li>The 6-step process is your reliable backbone for every project.</li>
+            <li>"Ask" and "Share" matter as much as the technical middle.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l0-4", title:"The analyst's toolkit & skills", dur:"9 min read",
+        sub:"What each tool is for, and the order to learn them.",
+        video:null,
+        body:`
+          <p>You'll hear a long list of tools thrown around. Here's what each one is actually for, so the path ahead makes sense.</p>
+          <h3>The core toolkit</h3>
+          <ul>
+            <li><strong>Excel</strong> — the universal starting point. Fast for cleaning, calculating, and exploring small-to-medium data. Almost every analytics job expects it.</li>
+            <li><strong>Power BI</strong> (or Tableau) — turns data into interactive dashboards stakeholders can click through. The "visual storytelling" layer.</li>
+            <li><strong>SQL</strong> — the language for pulling data <em>out of databases</em>. Non-negotiable once data is too big for a spreadsheet. <em>(Coming next in DATA LAB.)</em></li>
+            <li><strong>Python</strong> — for automation, bigger datasets, and statistics/forecasting. <em>(Coming after SQL.)</em></li>
+            <li><strong>Statistics</strong> — the reasoning that keeps your conclusions honest (averages, distributions, correlation vs causation).</li>
+          </ul>
+          <h3>The order that works</h3>
+          <p>Start with <strong>Excel → Power BI</strong> (this track), then add <strong>SQL → Python</strong>. This order builds confidence: Excel teaches you how data behaves, Power BI teaches you to communicate it, SQL scales you up, and Python automates it.</p>
+          <div class="callout"><div><b>Don't skip the soft skills:</b> business understanding and clear communication are what separate a junior who pulls numbers from an analyst people trust with decisions.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Excel + Power BI alone can land an entry-level analytics role.</li>
+            <li>Learn tools in the order they build on each other, not all at once.</li>
+            <li>Aim for "good enough to build projects", then learn the rest on the job.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l0-5", title:"Your roadmap: zero to job-ready", dur:"10 min read · 20 min video",
+        sub:"A realistic plan, plus how a portfolio gets you hired.",
+        video:{id:"d8U2G2_7dnM", title:"Data Analyst Roadmap — How I'd Learn Data Analytics", channel:"Data Analyst"},
+        more:[{id:"YRJbhFLLPyE", title:"The Complete Data Analyst Roadmap", channel:"Roadmap"}],
+        body:`
+          <p>You don't become job-ready by collecting certificates — you become job-ready by <strong>building things with data and being able to explain them</strong>. Here's a path that actually leads to a portfolio.</p>
+          <h3>A sensible timeline</h3>
+          <ul>
+            <li><strong>Weeks 1–4 — Excel:</strong> formulas, lookups, cleaning, PivotTables, a first mini-dashboard.</li>
+            <li><strong>Weeks 5–8 — Power BI:</strong> load &amp; clean data, build a model, write basic DAX, ship one polished dashboard.</li>
+            <li><strong>Weeks 9–12 — SQL:</strong> SELECT, filtering, joins, aggregations on a real dataset.</li>
+            <li><strong>Weeks 13+ — Python &amp; projects:</strong> pandas basics, then combine everything into 2–3 portfolio projects.</li>
+          </ul>
+          <h3>Build a portfolio as you go</h3>
+          <p>A portfolio is simply 2–4 finished projects that each answer a real question with a real dataset. Each should show: the question, your cleaning steps, the analysis, a visual, and a one-paragraph "so what". Host them on GitHub and write them up on LinkedIn.</p>
+          <div class="callout"><div><b>The 50–60% rule:</b> you don't need to master a tool before moving on. Once you can build something useful, start the next tool and keep improving the earlier ones through projects.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Projects &gt; certificates. Recruiters want to see you <em>do</em> the work.</li>
+            <li>One finished, explained dashboard beats ten half-watched tutorials.</li>
+            <li>Share your progress publicly — visibility creates opportunities.</li>
+          </ul></div>
+        `
+      }
+    ]
+  },
+  {
+    id:"m1", num:"02", title:"Excel for Data Analytics", soon:false,
+    blurb:"The universal analyst tool — clean, calculate, pivot, and chart.",
+    lessons:[
+      {
+        id:"l1-1", title:"Excel foundations for analysts", dur:"15 min read · 3 hr course",
+        sub:"The interface, cells, ranges, and data types — the right way.",
+        video:{id:"zXnQNytHCPM", title:"Learn Excel in Under 3 Hours — Pivot Tables, Lookups, Data Cleaning", channel:"Alex The Analyst"},
+        more:[{id:"pCJ15nGFgVg", title:"Excel for Data Analytics — Full Course for Beginners", channel:"freeCodeCamp"}],
+        body:`
+          <p>Excel is a grid of <strong>cells</strong>. Each cell has an address like <code>B4</code> (column B, row 4). A group of cells is a <strong>range</strong>, written <code>A1:C10</code>. Master these references and everything else clicks into place.</p>
+          <h3>Things every analyst should set up first</h3>
+          <ul>
+            <li><strong>Format data as a Table</strong> (<code>Ctrl + T</code>). Tables auto-expand, give columns names, and make formulas readable. Use them always.</li>
+            <li><strong>Freeze the header row</strong> (View → Freeze Panes) so column names stay visible while you scroll.</li>
+            <li><strong>Know your data types:</strong> text, numbers, dates, and booleans behave differently. A date stored as text won't sort or calculate correctly — a classic beginner trap.</li>
+          </ul>
+          <h3>References: relative vs absolute</h3>
+          <p>When you copy a formula, normal references like <code>A1</code> shift automatically (relative). Lock a reference with <code>$</code> — <code>$A$1</code> always points to the same cell (absolute). This one idea prevents most "my formula broke when I dragged it" problems.</p>
+          <div class="callout"><div><b>Workflow tip:</b> keep <em>raw data on one sheet, calculations on another</em>. Never type over your source data — you'll want it untouched when something looks wrong.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Cells → ranges → Tables. Always work inside Tables.</li>
+            <li><code>$</code> locks a reference; this is the cause of most formula bugs.</li>
+            <li>Keep raw data separate and never overwrite it.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l1-2", title:"Essential formulas & functions", dur:"14 min read",
+        sub:"The handful of functions that cover 90% of real work.",
+        video:null,
+        body:`
+          <p>You don't need hundreds of functions. A small, well-chosen set handles almost everything an analyst does.</p>
+          <h3>The everyday set</h3>
+          <ul>
+            <li><code>SUM</code>, <code>AVERAGE</code>, <code>MIN</code>, <code>MAX</code>, <code>COUNT</code> — basic aggregation.</li>
+            <li><code>COUNTIF</code> / <code>COUNTIFS</code> — count rows that meet conditions, e.g. orders from "Europe".</li>
+            <li><code>SUMIF</code> / <code>SUMIFS</code> — add up values that meet conditions, e.g. revenue for "2024" + "Online".</li>
+            <li><code>IF</code> — make a decision: <code>=IF(B2&gt;100,"High","Low")</code>.</li>
+            <li><code>IFERROR</code> — replace ugly errors with something clean: <code>=IFERROR(formula,"-")</code>.</li>
+          </ul>
+          <h3>Text & date helpers</h3>
+          <ul>
+            <li><code>LEFT</code>, <code>RIGHT</code>, <code>MID</code>, <code>LEN</code>, <code>TRIM</code> — slice and tidy text.</li>
+            <li><code>CONCAT</code> / <code>TEXTJOIN</code> — stitch fields together (e.g. first + last name).</li>
+            <li><code>TODAY</code>, <code>YEAR</code>, <code>MONTH</code>, <code>DATEDIF</code> — work with dates and durations.</li>
+          </ul>
+          <div class="callout"><div><b>Pattern to learn once:</b> the <code>...IFS</code> functions all follow the same shape — <em>range to act on, then pairs of (criteria-range, criteria)</em>. Learn <code>SUMIFS</code> and you instantly understand <code>COUNTIFS</code> and <code>AVERAGEIFS</code>.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Master the <code>...IFS</code> family — it answers most business questions.</li>
+            <li>Wrap risky formulas in <code>IFERROR</code> for clean reports.</li>
+            <li><code>TRIM</code> fixes the invisible spaces that break lookups.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l1-3", title:"Lookups: VLOOKUP, XLOOKUP & INDEX/MATCH", dur:"12 min read",
+        sub:"How to pull matching values from another table.",
+        video:null,
+        body:`
+          <p>Lookups answer "given this ID, what's the matching value over there?" — joining information from a second table. This is one of the most-used analyst skills.</p>
+          <h3>XLOOKUP — learn this first</h3>
+          <p>The modern, simplest lookup: <code>=XLOOKUP(value_to_find, list_to_search, list_to_return)</code>. To find a customer's city by their ID:</p>
+          <p><code>=XLOOKUP(A2, Customers[ID], Customers[City])</code></p>
+          <p>It searches in either direction, returns clean results, and lets you set a "if not found" message — far friendlier than VLOOKUP.</p>
+          <h3>VLOOKUP — still everywhere</h3>
+          <p>Older but extremely common, so you must recognise it: <code>=VLOOKUP(value, table_range, column_number, FALSE)</code>. The <code>FALSE</code> forces an <em>exact</em> match (almost always what you want). Its limits: it only looks rightward and breaks if columns move.</p>
+          <h3>INDEX/MATCH — the flexible classic</h3>
+          <p><code>=INDEX(return_column, MATCH(value, lookup_column, 0))</code>. More flexible than VLOOKUP and works in any direction. Worth knowing for older files that don't have XLOOKUP.</p>
+          <div class="callout"><div><b>Top cause of failed lookups:</b> mismatched data — extra spaces (fix with <code>TRIM</code>), or a number stored as text vs a real number. If a lookup returns <code>#N/A</code>, check the data types first.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Use <code>XLOOKUP</code> by default; know <code>VLOOKUP</code> because it's everywhere.</li>
+            <li>Always force exact match (<code>FALSE</code> / <code>0</code>).</li>
+            <li><code>#N/A</code> usually means a data-type or spacing mismatch.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l1-4", title:"Data cleaning & preparation", dur:"13 min read",
+        sub:"Turning messy exports into analysis-ready data.",
+        video:null,
+        body:`
+          <p>Clean data is the foundation of every trustworthy analysis. Real exports arrive messy — duplicates, blanks, inconsistent spelling, numbers stored as text. Here's the toolkit to fix them.</p>
+          <h3>The cleaning checklist</h3>
+          <ul>
+            <li><strong>Remove duplicates:</strong> Data → Remove Duplicates (after copying the raw data!).</li>
+            <li><strong>Trim spaces:</strong> <code>TRIM()</code> removes stray spaces that silently break sorting and lookups.</li>
+            <li><strong>Fix casing:</strong> <code>UPPER</code>, <code>LOWER</code>, <code>PROPER</code> standardise text like names and cities.</li>
+            <li><strong>Split & combine columns:</strong> <em>Text to Columns</em> splits "Smith, John" into two fields; <em>Flash Fill</em> (<code>Ctrl + E</code>) learns a pattern and fills the rest.</li>
+            <li><strong>Find & Replace</strong> (<code>Ctrl + H</code>): standardise values like "USA"/"U.S.A."/"United States".</li>
+            <li><strong>Handle blanks:</strong> decide whether a blank means zero, unknown, or a row to drop — never guess silently.</li>
+          </ul>
+          <h3>Meet Power Query</h3>
+          <p>For anything you'll repeat, use <strong>Power Query</strong> (Data → Get &amp; Transform). You record cleaning steps once, and every time new data arrives you just hit <em>Refresh</em> and all steps re-run. It's the bridge to Power BI, which uses the exact same engine — so learning it here pays off twice.</p>
+          <div class="callout"><div><b>Golden rule:</b> never clean on top of your raw data. Copy it first, or load it through Power Query, so you can always trace what changed.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Cleaning is the biggest, most valuable part of the job.</li>
+            <li><code>TRIM</code> + Remove Duplicates + consistent casing fix most issues.</li>
+            <li>Power Query makes repeated cleaning a one-click refresh.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l1-5", title:"PivotTables & PivotCharts", dur:"12 min read · 1 hr video",
+        sub:"Summarise thousands of rows in seconds — the analyst's superpower.",
+        video:{id:"lH7HfwUFnYA", title:"Pivot Tables in Excel — Tutorial for Beginners", channel:"Alex The Analyst"},
+        more:[
+          {id:"aofsdpjvK7w", title:"Learn Excel Pivot Tables in 10 Minutes", channel:"Chandoo"},
+          {id:"_ruOr1iD3GU", title:"PivotTables — A Quick Crash Course", channel:"Kevin Stratvert"}
+        ],
+        body:`
+          <p>A <strong>PivotTable</strong> summarises a large table into a compact report — totals, averages, and counts grouped any way you like — without writing a single formula. It is the fastest way to explore data in Excel.</p>
+          <h3>The four drop zones</h3>
+          <ul>
+            <li><strong>Rows:</strong> the categories down the side (e.g. Region).</li>
+            <li><strong>Columns:</strong> categories across the top (e.g. Year).</li>
+            <li><strong>Values:</strong> the numbers to summarise (e.g. Sum of Revenue).</li>
+            <li><strong>Filters:</strong> a control to narrow the whole report (e.g. Product = "Pro").</li>
+          </ul>
+          <p>Drag a field into a zone and the report rebuilds instantly. Want average instead of sum? Click the value field → Value Field Settings → choose the summary. Want a percentage of the total? Use <em>Show Values As</em>.</p>
+          <h3>Make it interactive</h3>
+          <ul>
+            <li><strong>Slicers</strong> — big clickable buttons to filter the report visually.</li>
+            <li><strong>Timelines</strong> — a slider to filter by date ranges.</li>
+            <li><strong>PivotCharts</strong> — a chart wired to the PivotTable that updates as you filter.</li>
+          </ul>
+          <div class="callout"><div><b>Build a mini-dashboard:</b> a PivotTable + PivotChart + a couple of slicers on one sheet <em>is</em> a working dashboard. This is your first portfolio-worthy Excel deliverable.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>PivotTables summarise huge data with zero formulas.</li>
+            <li>Rows/Columns/Values/Filters is the whole mental model.</li>
+            <li>Slicers + PivotChart = an interactive Excel dashboard.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l1-6", title:"Charts, formatting & dashboards", dur:"11 min read",
+        sub:"Turning a finding into a clear, honest visual.",
+        video:null,
+        body:`
+          <p>A chart's only job is to make one point obvious. Choose the chart that fits the message, then strip away everything that doesn't help.</p>
+          <h3>Pick the right chart</h3>
+          <ul>
+            <li><strong>Compare categories</strong> → bar / column chart.</li>
+            <li><strong>Show a trend over time</strong> → line chart.</li>
+            <li><strong>Show parts of a whole</strong> → stacked bar (avoid pie charts for more than 2–3 slices).</li>
+            <li><strong>Show relationship between two numbers</strong> → scatter plot.</li>
+          </ul>
+          <h3>Conditional formatting</h3>
+          <p>Make numbers speak for themselves: colour scales for heatmaps, data bars for in-cell bar charts, and rules to flag values (e.g. highlight any margin below 10% in red). Great for spotting outliers at a glance.</p>
+          <h3>Assemble a dashboard</h3>
+          <p>A good Excel dashboard fits on one screen, leads with the headline number, supports it with 2–4 charts, and offers slicers to explore. Keep colours minimal, label clearly, and remove gridlines and chart clutter. Less ink, more meaning.</p>
+          <div class="callout"><div><b>Honesty matters:</b> always start bar-chart axes at zero, and never use 3-D effects — they distort the very comparison you're trying to show.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Match the chart to the message; when unsure, use a bar chart.</li>
+            <li>Conditional formatting surfaces outliers instantly.</li>
+            <li>A dashboard = one screen, one headline, a few supporting visuals.</li>
+          </ul></div>
+        `
+      }
+    ]
+  },
+  {
+    id:"m2", num:"03", title:"Power BI for Data Analytics", soon:false,
+    blurb:"Build interactive dashboards a whole company can click through.",
+    lessons:[
+      {
+        id:"l2-1", title:"What is Power BI & the BI workflow", dur:"12 min read · video",
+        sub:"Desktop vs Service, and how a report comes to life.",
+        video:{id:"UXhGRVTndQA", title:"Power BI for Beginners — Full Tutorial", channel:"Pragmatic Works"},
+        body:`
+          <p><strong>Power BI</strong> is Microsoft's tool for building interactive dashboards from your data. Where Excel is a workshop for one analyst, Power BI is built to publish living reports that a whole organisation can click through.</p>
+          <h3>The pieces</h3>
+          <ul>
+            <li><strong>Power BI Desktop</strong> (free) — where you build: connect to data, clean it, model it, write DAX, and design the report.</li>
+            <li><strong>Power BI Service</strong> — the cloud, where you publish reports so others can view them in a browser or on mobile.</li>
+            <li><strong>Power Query</strong> — the data cleaning engine (the same one in Excel).</li>
+            <li><strong>DAX</strong> — the formula language for calculations.</li>
+          </ul>
+          <h3>The build workflow</h3>
+          <ul>
+            <li><strong>1. Get data</strong> — connect to Excel, CSV, databases, or the web.</li>
+            <li><strong>2. Transform</strong> — clean and shape it in Power Query.</li>
+            <li><strong>3. Model</strong> — connect tables with relationships.</li>
+            <li><strong>4. Add calculations</strong> — write measures in DAX.</li>
+            <li><strong>5. Visualise</strong> — build the report with charts and slicers.</li>
+            <li><strong>6. Publish</strong> — share it through the Service.</li>
+          </ul>
+          <div class="callout"><div><b>Coming from Excel?</b> You already know step 2 (Power Query is identical) and the idea of formulas (DAX). Power BI mostly adds the <em>modelling</em> and <em>publishing</em> layers on top.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Desktop builds; Service shares.</li>
+            <li>The workflow is: get → transform → model → calculate → visualise → publish.</li>
+            <li>Your Excel Power Query skills transfer directly.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l2-2", title:"Getting & transforming data (Power Query)", dur:"13 min read · full course",
+        sub:"Connect to sources and shape them into clean tables.",
+        video:{id:"cN8AO3_vmlY", title:"Learn Power BI — Full Course for Beginners", channel:"freeCodeCamp"},
+        body:`
+          <p>Before you can visualise anything, the data has to be clean and correctly shaped. In Power BI that happens in <strong>Power Query</strong> — the same recorded-steps engine you met in Excel, just more powerful.</p>
+          <h3>Connecting to data</h3>
+          <p>Home → Get Data lets you pull from Excel/CSV files, SQL databases, web pages, folders of files, and dozens of online services. Power BI keeps a live connection, so a <em>Refresh</em> re-pulls the latest data and re-applies all your steps.</p>
+          <h3>Common transformations</h3>
+          <ul>
+            <li><strong>Promote headers</strong> and set correct <strong>data types</strong> (text, number, date) for every column.</li>
+            <li><strong>Remove</strong> blank rows, duplicates, and columns you don't need.</li>
+            <li><strong>Split / merge columns</strong>, replace values, and trim text.</li>
+            <li><strong>Unpivot</strong> — turn wide "a column per month" data into a tall, tidy format Power BI loves.</li>
+            <li><strong>Append</strong> (stack tables on top of each other) and <strong>Merge</strong> (join tables side by side, like a lookup).</li>
+          </ul>
+          <div class="callout"><div><b>Why steps matter:</b> every transformation is saved as a step in the <em>Applied Steps</em> list. New data next month? Just refresh — no re-doing the cleaning. This repeatability is the whole point of Power Query.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Set correct data types early — most downstream errors start here.</li>
+            <li>"Tall and tidy" beats "wide" for analysis — unpivot when needed.</li>
+            <li>Cleaning is recorded once and refreshed forever.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l2-3", title:"Data modeling & relationships", dur:"12 min read",
+        sub:"Connecting tables the right way: the star schema.",
+        video:null,
+        body:`
+          <p>Power BI shines when you stop cramming everything into one giant table and instead <strong>model</strong> your data — connecting several focused tables with relationships. This is the concept that most separates Power BI from Excel.</p>
+          <h3>Fact tables vs dimension tables</h3>
+          <ul>
+            <li><strong>Fact table:</strong> the events you measure — sales, orders, clicks. Lots of rows, mostly numbers and IDs.</li>
+            <li><strong>Dimension tables:</strong> the descriptive lookups — Customers, Products, Dates, Regions. They give your facts context.</li>
+          </ul>
+          <h3>The star schema</h3>
+          <p>Arrange one fact table in the middle, connected out to several dimension tables — it looks like a star. This is the gold-standard model: it's fast, easy to understand, and makes DAX behave predictably.</p>
+          <p>Relationships connect a key in the dimension (e.g. <code>ProductID</code> in Products) to the same key in the fact table. Most are <strong>one-to-many</strong>: one product, many sales. The filter flows from the "one" side down to the "many" side, so filtering Products automatically filters Sales.</p>
+          <div class="callout"><div><b>Always add a dedicated Date table.</b> Time-based analysis (year-over-year, running totals) relies on it. Mark it as your official date table so time-intelligence DAX works.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Split data into one fact table + several dimension tables.</li>
+            <li>A star schema keeps reports fast and DAX predictable.</li>
+            <li>Relationships let one filter ripple through every connected table.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l2-4", title:"DAX fundamentals", dur:"15 min read · 3 hr course",
+        sub:"Measures, CALCULATE, and time intelligence.",
+        video:{id:"QJw4HkagVWc", title:"Power BI DAX Functions Tutorial — Full Course", channel:"Pragmatic Works"},
+        body:`
+          <p><strong>DAX</strong> (Data Analysis Expressions) is the formula language that powers Power BI's calculations. If Power Query shapes the data, DAX answers questions <em>about</em> it — totals, ratios, growth, rankings.</p>
+          <h3>Measures vs calculated columns</h3>
+          <ul>
+            <li><strong>Calculated column</strong> — computed row by row, stored in the table. Use sparingly (e.g. a category flag).</li>
+            <li><strong>Measure</strong> — computed on the fly based on whatever's filtered in the report. This is what you'll write 90% of the time.</li>
+          </ul>
+          <p>A simple measure: <code>Total Sales = SUM(Sales[Amount])</code>. Drop it on a chart by Region and it sums per region automatically — because measures respond to <strong>context</strong> (the filters and groupings around them).</p>
+          <h3>CALCULATE — the most important function</h3>
+          <p><code>CALCULATE</code> changes the filter context of a calculation. Want sales for only the "Online" channel regardless of the chart?</p>
+          <p><code>Online Sales = CALCULATE([Total Sales], Sales[Channel]="Online")</code></p>
+          <p>Almost every advanced DAX pattern is built on CALCULATE.</p>
+          <h3>Time intelligence</h3>
+          <p>With a proper Date table, functions like <code>TOTALYTD</code>, <code>SAMEPERIODLASTYEAR</code>, and <code>DATEADD</code> let you compute year-to-date totals and year-over-year growth in one line.</p>
+          <div class="callout"><div><b>The big idea:</b> DAX is all about <em>context</em> — the filters applied when a measure is evaluated. Understand context and CALCULATE, and DAX stops feeling like magic.</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>Write <em>measures</em>, not calculated columns, by default.</li>
+            <li>Measures react to the report's filter context automatically.</li>
+            <li><code>CALCULATE</code> + a Date table unlock most real analysis.</li>
+          </ul></div>
+        `
+      },
+      {
+        id:"l2-5", title:"Building reports & publishing", dur:"12 min read",
+        sub:"Visuals, slicers, drill-through, and sharing your work.",
+        video:null,
+        body:`
+          <p>Now the payoff: assembling a clean, interactive report and getting it in front of people.</p>
+          <h3>Core visuals</h3>
+          <ul>
+            <li><strong>Cards</strong> for headline KPIs (Total Sales, % Growth).</li>
+            <li><strong>Bar/column</strong> for comparisons, <strong>line</strong> for trends.</li>
+            <li><strong>Tables & matrices</strong> for detail (a matrix is Power BI's PivotTable).</li>
+            <li><strong>Maps</strong> for geography.</li>
+          </ul>
+          <h3>Make it interactive</h3>
+          <ul>
+            <li><strong>Slicers</strong> — on-canvas filters (date, region, category) the viewer controls.</li>
+            <li><strong>Cross-filtering</strong> — click a bar and every other visual filters to match. It's automatic.</li>
+            <li><strong>Drill-through</strong> — right-click a data point to jump to a detail page about it.</li>
+            <li><strong>Tooltips</strong> — hover to reveal extra context without cluttering the page.</li>
+          </ul>
+          <h3>Design & publish</h3>
+          <p>Keep it to one purposeful page: headline KPIs across the top, supporting charts below, slicers down one side, and a consistent colour theme. Then <strong>Publish</strong> to the Power BI Service, where you can schedule refreshes and share a link or build an app for stakeholders.</p>
+          <div class="callout"><div><b>Portfolio finish line:</b> one published, well-designed Power BI dashboard answering a real business question is a genuinely strong portfolio piece. Build it, screenshot it, and write up the "so what".</div></div>
+          <div class="keypoints"><div class="kp-head">Key takeaways</div><ul>
+            <li>KPIs up top, detail below, slicers to explore.</li>
+            <li>Interactivity (cross-filter, drill-through) is what makes BI shine.</li>
+            <li>Publishing to the Service is how your work reaches its audience.</li>
+          </ul></div>
+        `
+      }
+    ]
+  },
+  {
+    id:"m3", num:"04", title:"SQL", soon:true,
+    blurb:"Pull data straight from databases — joins, filtering, and aggregation.",
+    note:"Pull data straight from databases — SELECT, joins, filtering, and aggregation. Arriving after you've mastered Excel and Power BI.",
+    lessons:[]
+  },
+  {
+    id:"m4", num:"05", title:"Python", soon:true,
+    blurb:"Automate analysis and scale up with pandas — plus a first taste of stats.",
+    note:"Automate analysis and scale up with pandas, plus a first taste of statistics and forecasting.",
+    lessons:[]
+  }
+];
+
+/* ============================================================
+   State + safe storage (persists when hosted; never crashes)
+   ============================================================ */
+const STORE_KEY = "datalab_progress_v2";
+const safeStore = {
+  read(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return this._mem || {}; } },
+  write(o){ this._mem=o; try{ localStorage.setItem(STORE_KEY, JSON.stringify(o)); }catch(e){} },
+  _mem:{}
+};
+let store = safeStore.read();                 // { done:{id:true}, last:lessonId }
+let done = store.done || {};
+const flatLessons = [];
+COURSE.forEach(m=>m.lessons.forEach(l=>flatLessons.push({...l, moduleId:m.id, moduleNum:m.num, moduleTitle:m.title})));
+let currentId = store.last && flatLessons.some(l=>l.id===store.last) ? store.last : (flatLessons[0]?flatLessons[0].id:null);
+let showingHome = true;
+
+function persist(){ safeStore.write({done, last:currentId}); }
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function totalLessons(){ return flatLessons.length; }
+function doneCount(){ return flatLessons.filter(l=>done[l.id]).length; }
+function moduleDone(m){ return m.lessons.length>0 && m.lessons.every(l=>done[l.id]); }
+function ytThumb(id){ return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+function ytWatch(id){ return `https://www.youtube.com/watch?v=${id}`; }
+function ytSearch(q){ return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`; }
+
+/* ============================================================
+   YouTube IFrame API (lets us catch embed errors and degrade)
+   ============================================================ */
+let ytApiReady=false, ytApiRequested=false;
+function loadYTApi(){
+  if(ytApiRequested) return; ytApiRequested=true;
+  const s=document.createElement('script');
+  s.src="https://www.youtube.com/iframe_api"; s.async=true;
+  s.onerror=()=>{ ytApiReady=false; };
+  document.head.appendChild(s);
+}
+window.onYouTubeIframeAPIReady=function(){ ytApiReady=true; };
+
+function facadeMarkup(v, tag){
+  return `
+    <button class="facade" type="button" aria-label="Play video: ${esc(v.title)}">
+      <img class="fac-img" src="${ytThumb(v.id)}" alt="" loading="lazy" onerror="this.remove()">
+      <span class="fac-grad"></span>
+      ${tag?`<span class="fac-tag">${esc(tag)}</span>`:''}
+      <span class="fac-play" aria-hidden="true"></span>
+      <span class="fac-meta"><b>${esc(v.title)}</b><i>${esc(v.channel)} · YouTube</i></span>
+    </button>`;
+}
+function videoHolder(v, opts={}){
+  // a .video element carrying the data needed to mount/fallback
+  return `<div class="video" data-id="${esc(v.id)}" data-title="${esc(v.title)}" data-channel="${esc(v.channel)}">${facadeMarkup(v, opts.tag)}</div>`;
+}
+
+function mountPlayer(holder){
+  if(holder.classList.contains('is-playing')||holder.classList.contains('is-fallback')) return;
+  const id=holder.dataset.id;
+  holder.classList.add('is-playing');
+  holder.innerHTML='<div class="yt-mount"></div>';
+  const mount=holder.querySelector('.yt-mount');
+  let settled=false;
+  const fail=()=>{ if(settled)return; settled=true; renderFallback(holder); };
+
+  if(ytApiReady && window.YT && window.YT.Player){
+    try{
+      new window.YT.Player(mount,{
+        width:'100%', height:'100%', videoId:id,
+        playerVars:{autoplay:1, rel:0, modestbranding:1, playsinline:1},
+        events:{
+          onReady:e=>{ settled=true; try{e.target.playVideo();}catch(_){} },
+          onError:()=>fail()
+        }
+      });
+    }catch(e){ fail(); }
+  }else{
+    // API unavailable: best-effort plain embed; external link always present below.
+    mount.outerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&modestbranding=1" title="${esc(holder.dataset.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    loadYTApi();
+  }
+}
+function renderFallback(holder){
+  const id=holder.dataset.id, title=holder.dataset.title, channel=holder.dataset.channel;
+  holder.classList.remove('is-playing');
+  holder.classList.add('is-fallback');
+  holder.innerHTML=`
+    <div class="vf-card">
+      <div class="vf-thumb" style="background-image:url('${ytThumb(id)}')"></div>
+      <div class="vf-body">
+        <div class="vf-kicker">Plays on YouTube</div>
+        <div class="vf-title">${esc(title)}</div>
+        <div class="vf-chan">${esc(channel)}</div>
+        <div class="vf-actions">
+          <a class="vf-btn" href="${ytWatch(id)}" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+          <a class="vf-link" href="${ytSearch(title)}" target="_blank" rel="noopener">Find more like this</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   Render: sidebar pipeline
+   ============================================================ */
+function renderSpine(){
+  $("#spine").innerHTML = COURSE.map(m=>{
+    const isDone=moduleDone(m);
+    const hasCurrent=!showingHome && m.lessons.some(l=>l.id===currentId);
+    const cls=`module${isDone?' done':''}${hasCurrent?' active':''}${m.soon?' soon':''}`;
+    const lessonsHtml=m.soon?'':`<ul class="lessons">${m.lessons.map(l=>{
+        const checked=!!done[l.id];
+        const cur=(l.id===currentId && !showingHome);
+        return `<li><button data-lesson="${l.id}" class="${cur?'current':''}"${cur?' aria-current="true"':''}>
+            <span class="tick ${checked?'checked':''}" aria-hidden="true"></span>
+            <span>${esc(l.title)}</span>
+          </button></li>`;
+      }).join('')}</ul>`;
+    const right=m.soon?`<span class="soon-tag">soon</span>`
+      :`<span class="m-count">${m.lessons.filter(l=>done[l.id]).length}/${m.lessons.length}</span>`;
+    return `<div class="${cls}">
+        <span class="node" aria-hidden="true"></span>
+        <button class="m-title" data-module="${m.id}">
+          <span class="mnum">${m.num}</span><span>${esc(m.title)}</span>${right}
+        </button>
+        ${lessonsHtml}
+      </div>`;
+  }).join('');
+}
+
+function renderProgress(){
+  const pct=totalLessons()?Math.round(doneCount()/totalLessons()*100):0;
+  $("#fracDone").textContent=doneCount();
+  $("#fracTotal").textContent=totalLessons();
+  $("#pctFill").style.width=pct+"%";
+}
+
+/* ============================================================
+   Render: home
+   ============================================================ */
+function renderHome(){
+  const pct=totalLessons()?Math.round(doneCount()/totalLessons()*100):0;
+  const started=doneCount()>0;
+  $("#main").innerHTML=`
+    <section class="panel hero view-enter">
+      <div class="hero-l">
+        <span class="eyebrow">Data analytics · from zero</span>
+        <h1>Turn raw data into<br><em>decisions people trust.</em></h1>
+        <p class="lead">A guided track that starts with the career itself, then teaches you <strong>Excel</strong> and <strong>Power BI</strong> hands-on — full written lessons paired with the best video tutorials on the web. SQL and Python are on the way.</p>
+        <div class="cta-row">
+          <button class="cta" id="startBtn">${started?'Continue learning':'Start the track'} <span class="arr">→</span></button>
+          <span class="cta-note">${started?`${doneCount()}/${totalLessons()} done · ${pct}%`:`${totalLessons()} lessons · 3 modules live`}</span>
+        </div>
+      </div>
+      <div class="hero-r" aria-hidden="true">
+        <svg class="plot" id="heroPlot" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid meet">
+          <line class="axis" x1="34" y1="248" x2="338" y2="248"/>
+          <line class="axis" x1="34" y1="40" x2="34" y2="248"/>
+          <rect class="bar"    x="58"  y="186" width="34" height="62"  rx="2" style="animation-delay:.1s"/>
+          <rect class="bar"    x="108" y="150" width="34" height="98"  rx="2" style="animation-delay:.22s"/>
+          <rect class="bar"    x="158" y="168" width="34" height="80"  rx="2" style="animation-delay:.34s"/>
+          <rect class="bar"    x="208" y="120" width="34" height="128" rx="2" style="animation-delay:.46s"/>
+          <rect class="bar hi" x="258" y="80"  width="34" height="168" rx="2" style="animation-delay:.58s"/>
+          <polyline class="trend" points="75,196 125,160 175,178 225,128 275,92"/>
+          <circle class="dot"      cx="75"  cy="196" r="4.5" style="animation-delay:.7s"/>
+          <circle class="dot"      cx="125" cy="160" r="4.5" style="animation-delay:.82s"/>
+          <circle class="dot"      cx="175" cy="178" r="4.5" style="animation-delay:.94s"/>
+          <circle class="dot"      cx="225" cy="128" r="4.5" style="animation-delay:1.06s"/>
+          <circle class="dot last" cx="275" cy="92"  r="5.5" style="animation-delay:1.18s"/>
+          <text class="insight" x="34" y="26" style="animation-delay:1.3s">Q4 revenue ↑ 41%</text>
+          <text class="ptag" x="248" y="74" style="animation-delay:1.3s"><tspan font-weight="600" fill="#16181D">peak</tspan></text>
+        </svg>
+      </div>
+    </section>
+
+    <div class="mod-grid">
+      ${COURSE.map(m=>{
+        const live=!m.soon, md=moduleDone(m), dn=m.lessons.filter(l=>done[l.id]).length;
+        if(m.soon){
+          return `<div class="mcard is-soon"><span class="pin"></span>
+            <span class="mc-kick">Module ${m.num} · soon</span>
+            <span class="mc-title">${esc(m.title)}</span>
+            <p class="mc-desc">${esc(m.blurb)}</p>
+            <span class="mc-foot">Coming soon</span></div>`;
+        }
+        return `<button class="mcard" data-module="${m.id}">
+          <span class="pin"></span>
+          <span class="mc-prog ${md?'full':''}">${dn}/${m.lessons.length}</span>
+          <span class="mc-kick">Module ${m.num}</span>
+          <span class="mc-title">${esc(m.title)}</span>
+          <p class="mc-desc">${esc(m.blurb)}</p>
+          <span class="mc-foot">${md?'Review module':(dn>0?'Continue module':'Open module')} →</span>
+        </button>`;
+      }).join('')}
+    </div>`;
+
+  requestAnimationFrame(()=>{ const p=$("#heroPlot"); if(p) p.classList.add('anim'); });
+  $("#startBtn").addEventListener('click',()=>{
+    const next=flatLessons.find(l=>!done[l.id]) || flatLessons.find(l=>l.id===currentId) || flatLessons[0];
+    if(next) openLesson(next.id);
+  });
+  $("#main").querySelectorAll('[data-module]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const m=COURSE.find(x=>x.id===b.dataset.module);
+      if(m && m.lessons.length){
+        const target=m.lessons.find(l=>!done[l.id]) || m.lessons[0];
+        openLesson(target.id);
+      }
+    });
+  });
+}
+
+/* ============================================================
+   Render: a lesson
+   ============================================================ */
+function openLesson(id){
+  showingHome=false; currentId=id; persist();
+  const i=flatLessons.findIndex(l=>l.id===id);
+  const L=flatLessons[i], prev=flatLessons[i-1], next=flatLessons[i+1];
+  const isDone=!!done[id];
+
+  const videoBlock=L.video?`
+    ${videoHolder(L.video,{tag:'Featured tutorial'})}
+    <div class="video-meta">
+      <span class="vm-info"><b>${esc(L.video.title)}</b> — ${esc(L.video.channel)}</span>
+      <a class="yt-out" href="${ytWatch(L.video.id)}" target="_blank" rel="noopener">Open on YouTube ↗</a>
+    </div>`:'';
+
+  const moreBlock=(L.more && L.more.length)?`
+    <div class="more-videos">
+      <div class="mv-head">More tutorials on this topic</div>
+      <div class="mv-grid">
+        ${L.more.map(v=>`
+          <div class="mv-item">
+            ${videoHolder(v)}
+            <div class="mv-body"><div class="mv-t">${esc(v.title)}</div><div class="mv-c">${esc(v.channel)}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>`:'';
+
+  $("#main").innerHTML=`
+    <section class="panel lesson view-enter">
+      <div class="crumb">
+        <span>Module ${L.moduleNum} · ${esc(L.moduleTitle)}</span>
+        <span class="sep">/</span>
+        <span class="pos">Lesson ${i+1} of ${flatLessons.length}</span>
+        <span class="sep">/</span>
+        <span class="dur">${esc(L.dur)}</span>
+      </div>
+      <h2 id="lessonH" tabindex="-1">${esc(L.title)}</h2>
+      <p class="sub">${esc(L.sub)}</p>
+      ${videoBlock}
+      <div class="reading">${L.body}</div>
+      ${moreBlock}
+      <div class="lesson-foot">
+        <div class="upnext" id="upnext"></div>
+        <div class="foot-row">
+          <button class="mark-btn ${isDone?'is-done':''}" id="markBtn">
+            <span class="box"></span><span id="markLabel">${isDone?'Completed':'Mark as complete'}</span>
+          </button>
+          <div class="nav-btns">
+            <button id="prevBtn" ${prev?'':'disabled'}>← Previous</button>
+            <button id="nextBtn" ${next?'':'disabled'}>Next →</button>
+          </div>
+        </div>
+        <div class="kbd-hint">
+          <span><kbd>←</kbd> <kbd>→</kbd> move between lessons</span>
+          <span><kbd>M</kbd> mark complete</span>
+        </div>
+      </div>
+    </section>`;
+
+  // video facade play (delegated within lesson)
+  $("#main").querySelectorAll('.facade').forEach(f=>{
+    f.addEventListener('click',()=>mountPlayer(f.closest('.video')));
+  });
+
+  $("#markBtn").addEventListener('click',()=>toggleDone(id, next));
+  if(prev) $("#prevBtn").addEventListener('click',()=>openLesson(prev.id));
+  if(next) $("#nextBtn").addEventListener('click',()=>openLesson(next.id));
+
+  document.body.classList.remove('nav-open');
+  $("#menuToggle").setAttribute('aria-expanded','false');
+  window.scrollTo({top:0, behavior:'auto'});
+  const h=$("#lessonH"); if(h) h.focus({preventScroll:true});
+  renderSpine(); renderProgress(); updateReadBar();
+}
+
+function toggleDone(id, next){
+  const becoming=!done[id];
+  if(becoming) done[id]=true; else delete done[id];
+  persist();
+  const btn=$("#markBtn"), label=$("#markLabel");
+  if(btn){
+    btn.classList.toggle('is-done', becoming);
+    if(label) label.textContent=becoming?'Completed':'Mark as complete';
+    if(becoming){ btn.classList.add('celebrate'); setTimeout(()=>btn.classList.remove('celebrate'),420); }
+  }
+  const pill=$("#progPill"); if(pill && becoming){ pill.classList.add('pulse'); setTimeout(()=>pill.classList.remove('pulse'),650); }
+  // up-next nudge
+  const up=$("#upnext");
+  if(up){
+    if(becoming && next){
+      up.innerHTML=`<span>✓ Nice — lesson complete.</span> <b>Up next:</b> ${esc(next.title)} <a href="#" id="goNext">Continue →</a>`;
+      up.classList.add('show');
+      const g=$("#goNext"); if(g) g.addEventListener('click',e=>{e.preventDefault();openLesson(next.id);});
+    }else if(becoming && !next){
+      up.innerHTML=`<span>✓ That's every live lesson done. SQL and Python are on the way — build a portfolio project with what you've learned.</span>`;
+      up.classList.add('show');
+    }else{
+      up.classList.remove('show'); up.innerHTML='';
+    }
+  }
+  renderSpine(); renderProgress();
+}
+
+/* ============================================================
+   Reading-progress bar
+   ============================================================ */
+function updateReadBar(){
+  const bar=$("#readBar"), fill=$("#readFill");
+  if(!bar||!fill) return;
+  if(showingHome){ bar.style.opacity=0; fill.style.width='0%'; return; }
+  bar.style.opacity=1;
+  const sc=window.scrollY||document.documentElement.scrollTop;
+  const h=document.documentElement.scrollHeight - window.innerHeight;
+  const pct=h>0?Math.min(100,Math.max(0, sc/h*100)):0;
+  fill.style.width=pct+'%';
+}
+let ticking=false;
+window.addEventListener('scroll',()=>{ if(!ticking){ requestAnimationFrame(()=>{updateReadBar();ticking=false;}); ticking=true; }},{passive:true});
+
+/* ============================================================
+   Orchestration + events
+   ============================================================ */
+function goHome(){
+  showingHome=true; persist();
+  renderSpine(); renderProgress(); renderHome();
+  updateReadBar();
+  window.scrollTo({top:0,behavior:'auto'});
+  document.body.classList.remove('nav-open');
+  $("#menuToggle").setAttribute('aria-expanded','false');
+}
+
+$("#sidebar").addEventListener('click',e=>{
+  const lb=e.target.closest('[data-lesson]'); if(lb){ openLesson(lb.dataset.lesson); return; }
+  const mb=e.target.closest('[data-module]');
+  if(mb){ const m=COURSE.find(x=>x.id===mb.dataset.module); if(m&&m.lessons.length){ const t=m.lessons.find(l=>!done[l.id])||m.lessons[0]; openLesson(t.id);} }
+});
+$("#homeLink").addEventListener('click',e=>{ e.preventDefault(); goHome(); });
+$("#resetBtn").addEventListener('click',()=>{
+  if(confirm('Reset all progress? This clears every completed lesson.')){
+    done={}; persist(); renderSpine(); renderProgress();
+    if(showingHome) renderHome(); else openLesson(currentId);
+  }
+});
+$("#menuToggle").addEventListener('click',()=>{
+  const open=document.body.classList.toggle('nav-open');
+  $("#menuToggle").setAttribute('aria-expanded', open?'true':'false');
+});
+$("#backdrop").addEventListener('click',()=>{ document.body.classList.remove('nav-open'); $("#menuToggle").setAttribute('aria-expanded','false'); });
+
+// keyboard navigation
+document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const t=e.target;
+  if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+  if(e.key==='Escape'){ document.body.classList.remove('nav-open'); $("#menuToggle").setAttribute('aria-expanded','false'); return; }
+  if(showingHome) return;
+  const i=flatLessons.findIndex(l=>l.id===currentId);
+  if(e.key==='ArrowRight'||e.key===']'){ const n=flatLessons[i+1]; if(n){e.preventDefault();openLesson(n.id);} }
+  else if(e.key==='ArrowLeft'||e.key==='['){ const p=flatLessons[i-1]; if(p){e.preventDefault();openLesson(p.id);} }
+  else if(e.key==='m'||e.key==='M'){ e.preventDefault(); toggleDone(currentId, flatLessons[i+1]); }
+});
+
+// init
+loadYTApi();
+renderSpine(); renderProgress(); renderHome();
+</script>
+</body>
+</html>
